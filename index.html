@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMOKRATIE 2.0 | Isonomie Portal</title>
+    <style>
+        /* --- Φ | CORE VARIABLES --- */
+        :root {
+            --gold: #d4af37;
+            --gold-dim: rgba(212, 175, 55, 0.3);
+            --platinum: #e5e4e2;
+            --bg: #050505;
+            --phi: 1.618;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* --- GLOBAL RESET --- */
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--bg);
+            color: var(--platinum);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            height: 1000vh; /* Definiert die Länge der Zeitreise */
+            scroll-behavior: smooth;
+        }
+
+        /* --- 3D VIEWPORT --- */
+        #viewport {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            perspective: 1200px;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2;
+        }
+
+        #tunnel {
+            position: absolute;
+            transform-style: preserve-3d;
+            width: 100%; height: 100%;
+            will-change: transform;
+        }
+
+        /* --- LAYER ARCHITEKTUR --- */
+        .layer {
+            position: absolute;
+            width: 90%;
+            max-width: 1000px;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            /* Φ FIX: Startet sichtbar als Fail-Safe. JS setzt es auf 0. */
+            opacity: 1; 
+            backface-visibility: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            pointer-events: auto; /* Erlaubt Interaktion mit Links/Buttons */
+        }
+
+        /* --- MEDIEN MODULE --- */
+        .media-portal {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border: 1px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            margin: 2rem 0;
+            box-shadow: 0 0 40px var(--gold-dim);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s var(--phi);
+        }
+
+        .media-portal:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
+            border-color: #fff;
+        }
+
+        .play-icon {
+            font-size: 4rem;
+            color: var(--gold);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .audio-sphere {
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            margin: 2rem 0;
+            position: relative;
+            background: radial-gradient(circle, var(--gold-dim) 0%, rgba(0,0,0,1) 70%);
+            cursor: pointer;
+        }
+
+        .pulse {
+            position: absolute;
+            width: 100%; height: 100%;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--gold);
+            pointer-events: none;
+        }
+
+        /* --- TYPOGRAFIE --- */
+        h1 { 
+            font-size: clamp(2rem, 5vw, 4rem); 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            margin: 0; 
+            letter-spacing: 0.2em; 
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        
+        h2 { 
+            font-size: 1.5rem; 
+            color: var(--platinum); 
+            text-transform: uppercase; 
+            letter-spacing: 0.3em; 
+            margin-bottom: 1rem;
+        }
+
+        blockquote { 
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem); 
+            line-height: 1.6; 
+            font-style: italic; 
+            max-width: 700px; 
+            margin: 0;
+            text-shadow: 0 2px 4px black;
+        }
+
+        cite { 
+            display: block; 
+            margin-top: 2rem; 
+            color: var(--gold); 
+            font-size: 0.9rem; 
+            letter-spacing: 0.2em; 
+            text-transform: uppercase; 
+            font-weight: bold;
+        }
+
+        /* --- BACKGROUND --- */
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- OUTRO CARD (NAVIGATION) --- */
+        #outro-container {
+            width: 100%; max-width: 1100px;
+            padding: 3rem;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid var(--gold);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            text-align: left;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-col h3 { 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 1rem; 
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-list { list-style: none; padding: 0; }
+        .nav-list li { margin: 0.8rem 0; border-bottom: 1px solid #222; padding-bottom: 0.5rem; }
+        
+        .nav-btn {
+            background: none; border: none; color: var(--platinum);
+            font-size: 1rem; cursor: pointer; text-transform: uppercase;
+            transition: all 0.3s ease; padding: 0; text-align: left; width: 100%;
+            display: flex; justify-content: space-between;
+        }
+        .nav-btn:hover { color: var(--gold); padding-left: 10px; }
+        .nav-btn span { opacity: 0.5; font-size: 0.8em; }
+
+        .action-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 1rem 2rem;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .action-btn:hover { 
+            background: var(--gold); 
+            color: #000; 
+            box-shadow: 0 0 30px var(--gold); 
+        }
+
+        .ext-link { 
+            color: var(--platinum); 
+            text-decoration: none; 
+            display: block; 
+            margin: 1rem 0; 
+            padding: 1rem;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+        .ext-link:hover { 
+            border-color: var(--gold); 
+            background: rgba(212, 175, 55, 0.05); 
+        }
+        .ext-link strong { display: block; color: var(--gold); margin-bottom: 0.2rem;}
+
+        /* Error Message Style */
+        #js-error {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: darkred; color: white; padding: 10px; text-align: center; z-index: 9999;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="js-error">
+    Kinetik-Engine konnte nicht geladen werden. Bitte Dateipfade prüfen.
+</div>
+
+<!-- Kinetischer Hintergrund -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- 3D Bühne -->
+<div id="viewport">
+    <div id="tunnel">
+        
+        <!-- INTRO -->
+        <section class="layer" id="intro">
+            <h2 style="opacity: 0.6;">Status Quo</h2>
+            <h1>Der politische Stau</h1>
+            <p style="margin-top: 2rem;">Scrollen Sie, um das System neu zu starten.</p>
+            <div style="font-size: 2rem; margin-top: 3rem; animation: float 2s infinite ease-in-out;">↓</div>
+        </section>
+
+        <!-- AKT 1: ARISTOTELES (AUDIO) -->
+        <section class="layer" id="act1">
+            <div class="audio-sphere">
+                <div class="pulse"></div>
+                <span style="font-size: 2.5rem;">🎙️</span>
+            </div>
+            <cite>Akt 1: Die Ursprünge</cite>
+            <blockquote>„Es gilt als demokratisch, wenn die Ämter durch das Los besetzt werden.“</blockquote>
+            <p style="opacity:0.7; margin-top:0.5rem;">— Aristoteles</p>
+        </section>
+
+        <!-- AKT 2: MONTESQUIEU (VIDEO) -->
+        <section class="layer" id="act2">
+            <div class="media-portal">
+                <div class="play-icon">▶</div>
+            </div>
+            <cite>Akt 2: Die Logik</cite>
+            <blockquote>„Die Wahl durch Auswahl ist das Wesen der Aristokratie.“</blockquote>
+            <p style="opacity:0.7; margin-top:0.5rem;">— Montesquieu</p>
+        </section>
+
+        <!-- AKT 3: VAN REYBROUCK (AUDIO) -->
+        <section class="layer" id="act3">
+            <div class="audio-sphere">
+                <div class="pulse"></div>
+                <span style="font-size: 2.5rem;">🎙️</span>
+            </div>
+            <cite>Akt 3: Die moderne Krise</cite>
+            <blockquote>„Wir sind alle Wahl-Fundamentalisten geworden. Wir verachten die Gewählten, aber verehren die Wahl.“</blockquote>
+            <p style="opacity:0.7; margin-top:0.5rem;">— David Van Reybrouck</p>
+        </section>
+
+        <!-- AKT 4: VISION (VIDEO) -->
+        <section class="layer" id="act4">
+            <div class="media-portal">
+                <div class="play-icon">⚡</div>
+            </div>
+            <h1 style="font-size: 3.5rem;">DEMOKRATIE 2.0</h1>
+            <p style="letter-spacing: 0.2em; margin-top: 1rem;">Vom Zuschauer zum Architekten.</p>
+        </section>
+
+        <!-- OUTRO (NAV) -->
+        <section class="layer" id="outro">
+            <div id="outro-container">
+                
+                <!-- Spalte 1: Navigation -->
+                <div class="nav-col">
+                    <h3>Navigation</h3>
+                    <ul class="nav-list">
+                        <li><button class="nav-btn" onclick="scrollToLayer(0)">Intro <span>Start</span></button></li>
+                        <li><button class="nav-btn" onclick="scrollToLayer(1)">Akt 1 <span>Aristoteles</span></button></li>
+                        <li><button class="nav-btn" onclick="scrollToLayer(2)">Akt 2 <span>Montesquieu</span></button></li>
+                        <li><button class="nav-btn" onclick="scrollToLayer(3)">Akt 3 <span>Van Reybrouck</span></button></li>
+                        <li><button class="nav-btn" onclick="scrollToLayer(4)">Akt 4 <span>Die Vision</span></button></li>
+                    </ul>
+                    <a href="#" class="action-btn">⇩ Manifest PDF Herunterladen</a>
+                </div>
+
+                <!-- Spalte 2: Weiterführendes -->
+                <div class="nav-col">
+                    <h3>Vertiefung</h3>
+                    
+                    <a href="https://www.youtube.com/@NUTTLOS" target="_blank" class="ext-link">
+                        <strong>▶ YouTube Kanal: NUTT LOS</strong>
+                        Erklärungen von Ardalan Ibrahim
+                    </a>
+
+                    <a href="https://www.amazon.de/Gegen-Wahlen-Warum-abstimmen-nicht/dp/3835318713" target="_blank" class="ext-link">
+                        <strong>📖 Buch: „Gegen Wahlen“</strong>
+                        David Van Reybrouck
+                    </a>
+
+                    <a href="#" class="ext-link">
+                        <strong>🏛️ Losdemokratiepartei</strong>
+                        Offizielle Webseite (Coming Soon)
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- SCRIPT CORE -->
+<script type="module">
+    // Φ | PFAD-REPARATUR:
+    // Wir navigieren 3 Ebenen hoch (../../../), da deine index.html in "deusexlumen/los-demokratie/Los-Demokratie-..." liegt.
+    // Der "juliangarnier" Ordner liegt wahrscheinlich im Root.
+    import { 
+        createTimeline, 
+        onScroll, 
+        utils, 
+        animate, 
+        stagger 
+    } from '../../../juliangarnier/anime/anime-b82b2c7fb54b7fda1d487e3aee885f70d4c1d46d/dist/modules/index.js';
+
+    // Wenn das Modul lädt, verstecke Fehlermeldung
+    const errBox = document.getElementById('js-error');
+    if(errBox) errBox.style.display = 'none';
+
+    // --- 1. PARTIKEL ENGINE (ISONOMIE STROM) ---
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+
+    const resize = () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const particles = Array.from({length: 200}, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.5,
+        baseX: Math.random() * w,
+        baseY: Math.random() * h,
+        speed: Math.random() * 0.5 + 0.2
+    }));
+
+    const renderParticles = () => {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#d4af37';
+        particles.forEach(p => {
+            ctx.globalAlpha = p.alpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    };
+
+    // --- 2. TIMELINE CONFIGURATION ---
+    const layers = utils.$('.layer');
+    
+    // Φ FIX: Setze Opacity erst JETZT auf 0, nachdem JS erfolgreich geladen hat.
+    // Dies verhindert den "Black Screen", wenn JS abstürzt.
+    layers.forEach(el => el.style.opacity = 0);
+
+    const zStep = 3000; 
+    
+    // Initialisierung: Setze Layer tief in den Raum
+    layers.forEach((el, i) => {
+        utils.set(el, { translateZ: -i * zStep });
+    });
+
+    // Haupt-Timeline, gekoppelt an Scroll
+    const mainTL = createTimeline({
+        autoplay: onScroll({
+            target: 'body',
+            sync: 1,
+            debug: false, 
+            onUpdate: renderParticles 
+        })
+    });
+
+    const totalDistance = (layers.length - 1) * zStep;
+    
+    mainTL.add('#tunnel', {
+        translateZ: [0, totalDistance],
+        ease: 'linear'
+    }, 0);
+
+    // B) Layer Kinetik 
+    layers.forEach((el, i) => {
+        // Einblenden (Fade In)
+        // Φ FIX: Startzeitpunkt muss >= 0 sein. Wir nutzen i * 1000 ohne Offset für den Start.
+        mainTL.add(el, {
+            opacity: [0, 1],
+            scale: [0.6, 1],
+            filter: ['blur(20px)', 'blur(0px)'],
+            ease: 'out(1.618)',
+            duration: 1000
+        }, i * 1000); 
+
+        // Ausblenden (Fade Out) - Außer beim letzten Layer
+        if (i < layers.length - 1) {
+            mainTL.add(el, {
+                opacity: [1, 0],
+                scale: [1, 1.5], 
+                filter: ['blur(0px)', 'blur(40px)'],
+                ease: 'in(1.618)',
+                duration: 1000
+            }, (i * 1000) + 1200); // 1200ms Delay nach Einblenden
+        }
+    });
+
+    // --- 3. MOUSE PARALLAX (TIEFEN-ILLUSION) ---
+    window.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / w - 0.5) * 2; 
+        const y = (e.clientY / h - 0.5) * 2;
+
+        animate('#tunnel', {
+            rotateY: x * 3, 
+            rotateX: -y * 3,
+            translateX: -x * 20, 
+            translateY: -y * 20,
+            duration: 1200,
+            ease: 'out(2)',
+            composition: 'blend'
+        });
+
+        particles.forEach(p => {
+            const moveX = p.baseX - (x * 50 * p.speed);
+            const moveY = p.baseY - (y * 50 * p.speed);
+            p.x += (moveX - p.x) * 0.1;
+            p.y += (moveY - p.y) * 0.1;
+        });
+    });
+
+    // --- 4. ANIMATIONS-LOOPS (Pulsieren) ---
+    animate('.pulse', {
+        scale: [1, 1.6],
+        opacity: [0.6, 0],
+        duration: 2500,
+        loop: true,
+        delay: stagger(500),
+        ease: 'out(2.5)'
+    });
+
+    animate('#intro div', {
+        translateY: [-10, 10],
+        opacity: [0.5, 1],
+        duration: 1500,
+        direction: 'alternate',
+        loop: true,
+        ease: 'inOutSine'
+    });
+
+    // --- 5. NAVIGATION LOGIK ---
+    window.scrollToLayer = (index) => {
+        const totalHeight = document.body.scrollHeight - window.innerHeight;
+        // Korrigierte Berechnung basierend auf der tatsächlichen Timeline-Logik
+        const fraction = index / (layers.length - 1); 
+        
+        window.scrollTo({
+            top: totalHeight * fraction,
+            behavior: 'smooth'
+        });
+    };
+
+    mainTL.init();
+</script>
+</body>
+</html>
