@@ -337,16 +337,17 @@
 
 <!-- SCRIPT CORE -->
 <script type="module">
-    // Φ | PFAD-REPARATUR:
-    // Wir navigieren 3 Ebenen hoch (../../../), da deine index.html in "deusexlumen/los-demokratie/Los-Demokratie-..." liegt.
-    // Der "juliangarnier" Ordner liegt wahrscheinlich im Root.
+    // Φ | WICHTIG FÜR GITHUB PAGES (FORK-MODE):
+    // Da deine index.html im Hauptverzeichnis (Root) liegt und der Ordner 'dist' 
+    // ebenfalls im Root liegt (Standardstruktur des Anime.js Repos), ist dies der korrekte Pfad:
+    
     import { 
         createTimeline, 
         onScroll, 
         utils, 
         animate, 
         stagger 
-    } from '../../../juliangarnier/anime/anime-b82b2c7fb54b7fda1d487e3aee885f70d4c1d46d/dist/modules/index.js';
+    } from './dist/modules/index.js';
 
     // Wenn das Modul lädt, verstecke Fehlermeldung
     const errBox = document.getElementById('js-error');
