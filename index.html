@@ -8,9 +8,8 @@
         :root {
             --void: #050505;
             --gold: #d4af37;
-            --gold-bright: #ffd700;
             --platinum: #e5e4e2;
-            --glass: rgba(20, 20, 20, 0.95); /* Weniger Transparenz für Performance */
+            --glass: rgba(10, 10, 10, 0.95);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -25,14 +24,14 @@
             overscroll-behavior: none;
         }
 
-        /* --- LAYER 0: CANVAS (PARTIKEL) --- */
+        /* --- LAYER 0: CANVAS (GPU ACCELERATED) --- */
         #sovereign-field {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 0; pointer-events: none;
         }
 
-        /* --- LAYER 1: TUNNEL (VIEWPORT) --- */
+        /* --- LAYER 1: TUNNEL --- */
         #tunnel-viewport {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -40,15 +39,14 @@
             z-index: 1;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
-            /* GPU COMPOSITING LAYER ERZWINGEN */
+            /* GPU HACK */
             transform: translateZ(0);
-            backface-visibility: hidden;
         }
 
         #tunnel-world {
             position: absolute; width: 100%; height: 100%;
             transform-style: preserve-3d;
-            will-change: transform; /* Hint an Browser */
+            will-change: transform; /* Sagt dem Browser: Das hier bewegt sich ständig */
         }
 
         .node {
@@ -57,26 +55,25 @@
             width: 80vw; max-width: 800px;
             text-align: center;
             opacity: 0;
-            display: none; /* Standardmäßig aus dem DOM-Flow nehmen */
-            transform: translate(-50%, -50%);
-            will-change: transform, opacity;
+            /* GPU HACK FÜR ALLE KINDER */
+            transform: translate3d(-50%, -50%, 0); 
+            backface-visibility: hidden;
+            will-change: opacity, transform;
         }
 
         /* FAIL SAFE */
         @noscript {
-            .node { position: relative; opacity: 1; display: block; margin: 100px auto; transform: none; }
+            .node { position: relative; opacity: 1; transform: none; margin: 100px auto; }
             body { height: auto; overflow-y: auto; }
-            #tunnel-viewport { position: relative; perspective: none; }
         }
 
-        /* UI ELEMENTS - Schatten reduziert für Performance */
+        /* UI ELEMENTS - CLEAN & FAST */
         h1 {
             font-size: clamp(4rem, 8vw, 8rem);
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            color: transparent;
-            -webkit-text-stroke: 1px var(--gold);
+            color: var(--gold); /* Solid Color statt Stroke für Performance */
             margin-bottom: 2rem;
         }
 
@@ -86,13 +83,8 @@
             font-weight: 300;
             letter-spacing: 0.05em;
             margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gold);
             display: inline-block;
-            position: relative;
-        }
-        
-        h2::after {
-            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 2px; background: var(--gold);
         }
 
         p {
@@ -104,48 +96,44 @@
             margin-top: 3rem;
             padding: 3rem;
             background: var(--glass);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            /* KEIN BACKDROP-FILTER (Performance Killer #1) */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            transform-style: preserve-3d;
+            border: 1px solid var(--gold);
+            /* KEINE SCHATTEN (Shadows killen FPS) */
         }
 
         .icon {
             font-size: 5rem; display: block; margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
         /* Buttons */
         .btn-group { display: flex; gap: 2rem; justify-content: center; margin-top: 4rem; }
         .btn {
             padding: 1.2rem 3rem;
-            background: transparent;
+            background: var(--void);
             border: 1px solid var(--gold);
             color: var(--gold);
             text-decoration: none;
             text-transform: uppercase;
             letter-spacing: 0.2em;
             font-size: 0.9rem;
-            transition: background 0.3s ease, color 0.3s ease; /* Simplere Transition */
         }
         .btn:hover { background: var(--gold); color: var(--void); }
 
-        /* Scrollbar Hide */
+        /* Hide Scrollbar */
         ::-webkit-scrollbar { width: 0; }
         html { scrollbar-width: none; }
 
         /* Loader */
         #loader {
             position: fixed; inset: 0; background: var(--void); z-index: 999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--gold);
+            transition: opacity 0.3s;
         }
-        .loader-text { color: var(--gold); letter-spacing: 0.5em; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="loader-text">Φ | OPTIMIZING...</div></div>
+    <div id="loader">Φ | SYNCING GPU...</div>
 
     <canvas id="sovereign-field"></canvas>
 
@@ -155,9 +143,7 @@
             <section class="node" id="prolog" data-z="0" data-act="prolog">
                 <h1>Stasis</h1>
                 <p>Der politische Stau. Parteien als Gatekeeper.<br>Willkommen im Ende der Geschichte.</p>
-                <div style="margin-top: 5rem; font-size: 0.8rem; color: var(--gold); opacity: 0.7;">
-                    ▼ SCROLL TO DESCEND ▼
-                </div>
+                <div style="margin-top: 5rem; opacity: 0.5; color: var(--gold);">▼ SCROLL TO DESCEND ▼</div>
             </section>
 
             <section class="node" id="act-1" data-z="3500" data-act="order">
@@ -193,7 +179,7 @@
             <section class="node" id="act-4" data-z="14000" data-act="glory">
                 <span class="icon">✨</span>
                 <h2>Demokratie 2.0</h2>
-                <div class="media-slot" style="box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);">
+                <div class="media-slot" style="border: 2px solid var(--gold);">
                     <p><strong>[VIDEO: Die Kinetische Isonomie]</strong></p>
                     <br>
                     <p>Keine Politiker mehr. Bürger. Verantwortung. Freiheit.<br>Das finale Bild.</p>
@@ -217,19 +203,19 @@
 
         // --- CONFIG ---
         const CONFIG = {
-            colors: { gold: '#d4af37', white: '#e5e4e2', void: '#050505' },
-            particleCount: 150, // Reduziert für Performance (reicht völlig aus)
-            renderDistance: 2500 // Frustum Culling Distanz
+            colors: { gold: '#d4af37', white: '#e5e4e2' },
+            particleCount: 100, // Reduziert für Stabilität
+            renderDistance: 3000
         };
 
+        // --- STATE ---
         const STATE = {
             currentScroll: 0,
             activeAct: 'prolog',
-            scrollSpeed: 0,
-            isScrolling: false
+            scrollSpeed: 0
         };
 
-        // --- DOM CACHE ---
+        // --- CACHED DOM ---
         const world = document.getElementById('tunnel-world');
         const nodes = Array.from(document.querySelectorAll('.node')).map(el => ({
             el,
@@ -238,7 +224,7 @@
             visible: false
         }));
         const canvas = document.getElementById('sovereign-field');
-        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true }); // Speed hacks
+        const ctx = canvas.getContext('2d', { alpha: false }); // Alpha false ist schneller
         let w, h;
 
         // --- INIT ---
@@ -250,117 +236,95 @@
             window.addEventListener('resize', resize);
             resize();
 
-            // Initiale Platzierung
+            // Initiale statische Platzierung
             nodes.forEach(node => {
-                node.el.style.transform = `translate(-50%, -50%) translateZ(${node.z}px)`;
+                // translate3d erzwingt GPU layer
+                node.el.style.transform = `translate3d(-50%, -50%, ${node.z}px)`;
             });
 
-            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 500);
-            setTimeout(() => { document.getElementById('loader').remove(); }, 1000);
+            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 200);
+            setTimeout(() => { document.getElementById('loader').remove(); }, 600);
         }
         init();
 
-        // --- PARTICLE SYSTEM (OPTIMIZED) ---
+        // --- HIGH PERFORMANCE PARTICLES ---
         class Particle {
-            constructor() { this.init(); }
-            init() {
+            constructor() {
                 this.x = Math.random() * w;
                 this.y = Math.random() * h;
-                this.size = Math.random() * 2 + 0.5;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.color = CONFIG.colors.gold;
+                this.size = Math.random() * 2 + 1;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
             }
-            update(act, speed) {
-                // Simplifizierte Physik
-                let speedMult = 1 + (speed * 0.01);
-                
-                if (act === 'glory') this.color = '#ffffff';
-                else this.color = CONFIG.colors.gold;
-
-                if (act === 'chaos') {
-                    this.x += (Math.random() - 0.5) * 4;
-                    this.y += (Math.random() - 0.5) * 4;
-                } else {
-                    this.x += this.vx * speedMult;
-                    this.y += this.vy * speedMult;
-                }
-
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
                 if(this.x > w) this.x = 0; if(this.x < 0) this.x = w;
                 if(this.y > h) this.y = 0; if(this.y < 0) this.y = h;
             }
             draw() {
-                ctx.fillStyle = this.color;
-                // PERFORMANCE HACK: fillRect ist schneller als arc
+                // Zeichnen einfacher Rechtecke (schneller als Kreise)
                 ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
         const particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
 
-        // --- MAIN RENDER LOOP ---
+        // --- THE LOOP (60 FPS GOAL) ---
         let targetScroll = 0;
-        let isIdle = false;
 
         function render() {
             targetScroll = window.scrollY;
             
-            // IDLE DETECTION: Wenn wir nah am Ziel sind, weniger rechnen
-            if (Math.abs(targetScroll - STATE.currentScroll) < 0.1 && STATE.scrollSpeed < 0.1) {
-                STATE.currentScroll = targetScroll; // Snap to clean value
-                if (!isIdle) {
-                    isIdle = true;
-                    // Einmal final rendern für Schärfe
-                }
-            } else {
-                isIdle = false;
-                // Lerp Logic
-                STATE.currentScroll += (targetScroll - STATE.currentScroll) * 0.1;
-            }
+            // Sehr einfaches LERP
+            STATE.currentScroll += (targetScroll - STATE.currentScroll) * 0.1;
             
-            STATE.scrollSpeed = Math.abs(targetScroll - STATE.currentScroll);
+            // 1. World Move (Ganze Welt schieben)
+            // Nutze toFixed(2) um Subpixel-Rendering Artefakte zu reduzieren
+            world.style.transform = `translate3d(0, 0, ${-STATE.currentScroll.toFixed(2)}px)`;
 
-            // 1. World Transform (Nur bewegen wenn nötig)
-            if (!isIdle || STATE.activeAct === 'chaos') {
-                world.style.transform = `translateZ(${-STATE.currentScroll}px)`;
+            // 2. Node Visibility (Simple Math only)
+            // Keine DOM Manipulation außer opacity und visibility
+            let actFound = false;
+
+            nodes.forEach(node => {
+                const dist = Math.abs(node.z - STATE.currentScroll);
                 
-                // 2. Node Logic (Frustum Culling)
-                let newActiveAct = STATE.activeAct;
-                
-                nodes.forEach(node => {
-                    const dist = Math.abs(node.z - STATE.currentScroll);
-                    
-                    // FRUSTUM CULLING: Nur rendern wenn in der Nähe
-                    if (dist < CONFIG.renderDistance) {
-                        if (!node.visible) {
-                            node.el.style.display = 'block';
-                            node.visible = true;
-                        }
-                        
-                        // Simple Opacity Calculation (Kein Blur!)
-                        const opacity = Math.max(0, 1 - (dist / 1500));
-                        node.el.style.opacity = opacity;
-                        
-                        // Scale Effekt (günstig für GPU)
-                        const scale = 0.8 + (opacity * 0.2);
-                        // Wir nutzen translate3d für Hardware Acceleration
-                        node.el.style.transform = `translate(-50%, -50%) translateZ(${node.z}px) scale(${scale})`;
-
-                        if (dist < 800) newActiveAct = node.act;
-
-                    } else {
-                        if (node.visible) {
-                            node.el.style.display = 'none'; // Aus dem Render-Tree entfernen
-                            node.visible = false;
-                        }
+                if (dist < CONFIG.renderDistance) {
+                    // Sichtbarkeitsberechnung
+                    if (!node.visible) {
+                        node.el.style.visibility = 'visible';
+                        node.visible = true;
                     }
-                });
-                STATE.activeAct = newActiveAct;
-            }
+                    
+                    // Opacity
+                    let opacity = 0;
+                    if (dist < 1000) opacity = 1 - (dist / 1000);
+                    node.el.style.opacity = opacity.toFixed(2);
 
-            // 3. Particles immer rendern (für Lebendigkeit), aber effizient
-            ctx.clearRect(0, 0, w, h);
+                    if (dist < 500 && !actFound) {
+                        STATE.activeAct = node.act;
+                        actFound = true;
+                    }
+                } else {
+                    if (node.visible) {
+                        node.el.style.visibility = 'hidden'; // Besser als display:none
+                        node.el.style.opacity = 0;
+                        node.visible = false;
+                    }
+                }
+            });
+
+            // 3. Canvas Render (Hintergrundfarbe löschen manuell)
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Farbe basierend auf Akt
+            if (STATE.activeAct === 'glory') ctx.fillStyle = '#ffffff';
+            else if (STATE.activeAct === 'chaos') ctx.fillStyle = '#ff4444';
+            else ctx.fillStyle = '#d4af37';
+
             particles.forEach(p => {
-                p.update(STATE.activeAct, STATE.scrollSpeed);
+                p.update();
                 p.draw();
             });
 
