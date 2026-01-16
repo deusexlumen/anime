@@ -3,500 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Isonomie Portal</title>
+    <title>DEMOKRATIE 2.0 | Der Abstieg in die Souveränität</title>
     <style>
-        /* --- Φ | CORE VARIABLES --- */
         :root {
+            --void: #050505;
             --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.3);
             --platinum: #e5e4e2;
-            --bg: #050505;
-            --phi: 1.618;
-            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --gold-dim: rgba(212, 175, 55, 0.3);
+            --font-main: 'Helvetica Neue', Arial, sans-serif; /* Platzhalter für System-Font */
         }
 
-        /* --- GLOBAL RESET --- */
-        body, html {
-            margin: 0; padding: 0;
-            background: var(--bg);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--void);
             color: var(--platinum);
             font-family: var(--font-main);
             overflow-x: hidden;
-            /* Φ UPDATE: Mehr Scroll-Raum für ruhigeres Tempo */
-            height: 1200vh; 
-            scroll-behavior: smooth;
+            /* Wir behalten das native Scrollen bei, nutzen die Werte aber für 3D-Transforms */
+            height: 15000px; /* Virtuelle Höhe für den Tunnel-Weg */
         }
 
-        /* --- 3D VIEWPORT --- */
-        #viewport {
+        /* --- LAYER 0: CANVAS (PARTIKEL) --- */
+        #sovereign-field {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            perspective: 1200px;
-            overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        #tunnel {
+        /* --- LAYER 1: TUNNEL (INHALT) --- */
+        #tunnel-viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #tunnel-world {
             position: absolute;
+            width: 100%;
+            height: 100%;
             transform-style: preserve-3d;
-            width: 100%; height: 100%;
             will-change: transform;
         }
 
-        /* --- LAYER ARCHITEKTUR --- */
-        .layer {
+        .node {
             position: absolute;
-            width: 90%;
-            max-width: 1000px;
-            left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Zentrierung */
             text-align: center;
-            /* Φ FIX: Startet sichtbar als Fail-Safe. JS setzt es auf 0. */
-            opacity: 1; 
-            backface-visibility: hidden;
-            display: flex; flex-direction: column; align-items: center;
-            pointer-events: auto; /* Erlaubt Interaktion mit Links/Buttons */
-        }
-
-        /* --- MEDIEN MODULE --- */
-        .media-portal {
-            width: 100%;
+            width: 80vw;
             max-width: 800px;
-            aspect-ratio: 16/9;
-            background: #000;
-            border: 1px solid var(--gold);
-            display: flex; align-items: center; justify-content: center;
-            margin: 2rem 0;
-            box-shadow: 0 0 40px var(--gold-dim);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.5s var(--phi);
+            /* Initialer State für Fail-Safe (wird von JS überschrieben) */
+            opacity: 1; 
         }
 
-        .media-portal:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
-            border-color: #fff;
-        }
-
-        .play-icon {
+        /* Typografie & UI */
+        h1 {
             font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
             color: var(--gold);
-            opacity: 0.8;
-            transition: opacity 0.3s;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--gold-dim);
         }
 
-        .audio-sphere {
-            width: 160px; height: 160px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            display: flex; align-items: center; justify-content: center;
-            margin: 2rem 0;
-            position: relative;
-            background: radial-gradient(circle, var(--gold-dim) 0%, rgba(0,0,0,1) 70%);
-            cursor: pointer;
+        h2 {
+            font-size: 2rem;
+            color: var(--platinum);
+            font-weight: 300;
+            border-bottom: 1px solid var(--gold);
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
         }
 
-        .pulse {
-            position: absolute;
-            width: 100%; height: 100%;
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .media-container {
+            margin-top: 2rem;
             border: 1px solid var(--gold);
-            border-radius: 50%;
-            box-shadow: 0 0 20px var(--gold);
-            pointer-events: none;
+            padding: 1rem;
+            background: rgba(5, 5, 5, 0.8);
         }
 
-        /* --- TYPOGRAFIE --- */
-        h1 { 
-            font-size: clamp(2rem, 5vw, 4rem); 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            margin: 0; 
-            letter-spacing: 0.2em; 
-            text-shadow: 0 0 30px rgba(0,0,0,0.8);
-        }
-        
-        h2 { 
-            font-size: 1.5rem; 
-            color: var(--platinum); 
-            text-transform: uppercase; 
-            letter-spacing: 0.3em; 
+        .icon {
+            font-size: 3rem;
+            display: block;
             margin-bottom: 1rem;
         }
 
-        blockquote { 
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem); 
-            line-height: 1.6; 
-            font-style: italic; 
-            max-width: 700px; 
-            margin: 0;
-            text-shadow: 0 2px 4px black;
+        /* --- OUTRO / NAVIGATION --- */
+        .outro-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 3rem;
         }
 
-        cite { 
-            display: block; 
-            margin-top: 2rem; 
-            color: var(--gold); 
-            font-size: 0.9rem; 
-            letter-spacing: 0.2em; 
-            text-transform: uppercase; 
-            font-weight: bold;
-        }
-
-        /* --- BACKGROUND --- */
-        #particle-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* --- OUTRO CARD (NAVIGATION) --- */
-        #outro-container {
-            width: 100%; max-width: 1100px;
-            padding: 3rem;
-            background: rgba(10, 10, 10, 0.95);
-            border: 1px solid var(--gold);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
-            text-align: left;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-col h3 { 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            border-bottom: 1px solid #333; 
-            padding-bottom: 1rem; 
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-list { list-style: none; padding: 0; }
-        .nav-list li { margin: 0.8rem 0; border-bottom: 1px solid #222; padding-bottom: 0.5rem; }
-        
-        .nav-btn {
-            background: none; border: none; color: var(--platinum);
-            font-size: 1rem; cursor: pointer; text-transform: uppercase;
-            transition: all 0.3s ease; padding: 0; text-align: left; width: 100%;
-            display: flex; justify-content: space-between;
-        }
-        .nav-btn:hover { color: var(--gold); padding-left: 10px; }
-        .nav-btn span { opacity: 0.5; font-size: 0.8em; }
-
-        .action-btn {
-            display: inline-block;
-            margin-top: 1rem;
+        .btn {
             padding: 1rem 2rem;
             border: 1px solid var(--gold);
             color: var(--gold);
             text-decoration: none;
             text-transform: uppercase;
-            font-weight: bold;
-            transition: all 0.3s;
-            width: 100%;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .action-btn:hover { 
-            background: var(--gold); 
-            color: #000; 
-            box-shadow: 0 0 30px var(--gold); 
+            transition: all 0.3s ease;
         }
 
-        .ext-link { 
-            color: var(--platinum); 
-            text-decoration: none; 
-            display: block; 
-            margin: 1rem 0; 
-            padding: 1rem;
-            border: 1px solid #333;
-            transition: 0.3s;
-        }
-        .ext-link:hover { 
-            border-color: var(--gold); 
-            background: rgba(212, 175, 55, 0.05); 
-        }
-        .ext-link strong { display: block; color: var(--gold); margin-bottom: 0.2rem;}
-
-        /* Error Message Style */
-        #js-error {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: darkred; color: white; padding: 10px; text-align: center; z-index: 9999;
+        .btn:hover {
+            background: var(--gold);
+            color: var(--void);
+            box-shadow: 0 0 15px var(--gold);
         }
 
+        /* Scroll-Bar verstecken (für Immersion) */
+        ::-webkit-scrollbar { width: 0; }
+        
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--void);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            transition: opacity 1s ease;
+        }
     </style>
 </head>
 <body>
 
-<div id="js-error">
-    Kinetik-Engine konnte nicht geladen werden. Bitte Dateipfade prüfen.
-</div>
+    <div id="loading-overlay">Φ | INITIALIZING SOVEREIGNTY...</div>
 
-<!-- Kinetischer Hintergrund -->
-<canvas id="particle-canvas"></canvas>
+    <canvas id="sovereign-field"></canvas>
 
-<!-- 3D Bühne -->
-<div id="viewport">
-    <div id="tunnel">
-        
-        <!-- INTRO -->
-        <section class="layer" id="intro">
-            <h2 style="opacity: 0.6;">Status Quo</h2>
-            <h1>Der politische Stau</h1>
-            <p style="margin-top: 2rem;">Scrollen Sie, um das System neu zu starten.</p>
-            <div style="font-size: 2rem; margin-top: 3rem; animation: float 2s infinite ease-in-out;">↓</div>
-        </section>
+    <div id="tunnel-viewport">
+        <div id="tunnel-world">
+            
+            <section class="node" id="prolog" data-z="0">
+                <h1>Stasis</h1>
+                <p>Der politische Stau. Parteien als Gatekeeper.<br>Willkommen im Ende der Geschichte.</p>
+                <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--gold);">SCROLL TO DESCEND</div>
+            </section>
 
-        <!-- AKT 1: ARISTOTELES (AUDIO) -->
-        <section class="layer" id="act1">
-            <div class="audio-sphere">
-                <div class="pulse"></div>
-                <span style="font-size: 2.5rem;">🎙️</span>
-            </div>
-            <cite>Akt 1: Die Ursprünge</cite>
-            <blockquote>„Es gilt als demokratisch, wenn die Ämter durch das Los besetzt werden.“</blockquote>
-            <p style="opacity:0.7; margin-top:0.5rem;">— Aristoteles</p>
-        </section>
-
-        <!-- AKT 2: MONTESQUIEU (VIDEO) -->
-        <section class="layer" id="act2">
-            <div class="media-portal">
-                <div class="play-icon">▶</div>
-            </div>
-            <cite>Akt 2: Die Logik</cite>
-            <blockquote>„Die Wahl durch Auswahl ist das Wesen der Aristokratie.“</blockquote>
-            <p style="opacity:0.7; margin-top:0.5rem;">— Montesquieu</p>
-        </section>
-
-        <!-- AKT 3: VAN REYBROUCK (AUDIO) -->
-        <section class="layer" id="act3">
-            <div class="audio-sphere">
-                <div class="pulse"></div>
-                <span style="font-size: 2.5rem;">🎙️</span>
-            </div>
-            <cite>Akt 3: Die moderne Krise</cite>
-            <blockquote>„Wir sind alle Wahl-Fundamentalisten geworden. Wir verachten die Gewählten, aber verehren die Wahl.“</blockquote>
-            <p style="opacity:0.7; margin-top:0.5rem;">— David Van Reybrouck</p>
-        </section>
-
-        <!-- AKT 4: VISION (VIDEO) -->
-        <section class="layer" id="act4">
-            <div class="media-portal">
-                <div class="play-icon">⚡</div>
-            </div>
-            <h1 style="font-size: 3.5rem;">DEMOKRATIE 2.0</h1>
-            <p style="letter-spacing: 0.2em; margin-top: 1rem;">Vom Zuschauer zum Architekten.</p>
-        </section>
-
-        <!-- OUTRO (NAV) -->
-        <section class="layer" id="outro">
-            <div id="outro-container">
-                
-                <!-- Spalte 1: Navigation -->
-                <div class="nav-col">
-                    <h3>Navigation</h3>
-                    <ul class="nav-list">
-                        <li><button class="nav-btn" onclick="scrollToLayer(0)">Intro <span>Start</span></button></li>
-                        <li><button class="nav-btn" onclick="scrollToLayer(1)">Akt 1 <span>Aristoteles</span></button></li>
-                        <li><button class="nav-btn" onclick="scrollToLayer(2)">Akt 2 <span>Montesquieu</span></button></li>
-                        <li><button class="nav-btn" onclick="scrollToLayer(3)">Akt 3 <span>Van Reybrouck</span></button></li>
-                        <li><button class="nav-btn" onclick="scrollToLayer(4)">Akt 4 <span>Die Vision</span></button></li>
-                    </ul>
-                    <a href="#" class="action-btn">⇩ Manifest PDF Herunterladen</a>
+            <section class="node" id="act-1" data-z="3000">
+                <span class="icon">🏛️</span>
+                <h2>Der Ursprung</h2>
+                <div class="media-container">
+                    <p>[AUDIO-SLOT: Aristoteles & Die Isonomie]</p>
+                    <p><i>"Wahlen sind oligarchisch, das Los ist demokratisch."</i></p>
                 </div>
+            </section>
 
-                <!-- Spalte 2: Weiterführendes -->
-                <div class="nav-col">
-                    <h3>Vertiefung</h3>
-                    
-                    <a href="https://www.youtube.com/@NUTTLOS" target="_blank" class="ext-link">
-                        <strong>▶ YouTube Kanal: NUTT LOS</strong>
-                        Erklärungen von Ardalan Ibrahim
-                    </a>
-
-                    <a href="https://www.amazon.de/Gegen-Wahlen-Warum-abstimmen-nicht/dp/3835318713" target="_blank" class="ext-link">
-                        <strong>📖 Buch: „Gegen Wahlen“</strong>
-                        David Van Reybrouck
-                    </a>
-
-                    <a href="#" class="ext-link">
-                        <strong>🏛️ Losdemokratiepartei</strong>
-                        Offizielle Webseite (Coming Soon)
-                    </a>
+            <section class="node" id="act-2" data-z="6000">
+                <span class="icon">⚖️</span>
+                <h2>Die Logik des Zufalls</h2>
+                <div class="media-container">
+                    <p>[VIDEO-SLOT: Wahl vs. Los]</p>
+                    <p>Korruption durchbrechen. Kompetenz durch Diversität ersetzen.</p>
                 </div>
+            </section>
 
-            </div>
-        </section>
+            <section class="node" id="act-3" data-z="9000">
+                <span class="icon">🌪️</span>
+                <h2>Die Moderne Krise</h2>
+                <div class="media-container">
+                    <p>[AUDIO-SLOT: Gegen Wahlen]</p>
+                    <p>Warum wir unsere Demokratie retten müssen, indem wir sie neu erfinden.</p>
+                </div>
+            </section>
 
+            <section class="node" id="act-4" data-z="12000">
+                <span class="icon">✨</span>
+                <h2>Demokratie 2.0</h2>
+                <div class="media-container">
+                    <p>[VIDEO-SLOT: Die Kinetische Isonomie]</p>
+                    <p>Keine Politiker mehr. Bürger. Verantwortung. Freiheit.</p>
+                </div>
+            </section>
+
+            <section class="node" id="outro" data-z="15000">
+                <h1>Souveränität</h1>
+                <p>Du bist am Grund angekommen. Baue neu.</p>
+                <div class="outro-links">
+                    <a href="#" class="btn">Manifest (PDF)</a>
+                    <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="btn">NUTT LOS (YT)</a>
+                </div>
+            </section>
+
+        </div>
     </div>
-</div>
 
-<!-- SCRIPT CORE -->
-<script type="module">
-    // Φ | WICHTIG FÜR GITHUB PAGES (FORK-MODE):
-    // Da deine index.html im Hauptverzeichnis (Root) liegt und der Ordner 'dist' 
-    // ebenfalls im Root liegt (Standardstruktur des Anime.js Repos), ist dies der korrekte Pfad:
-    
-    import { 
-        createTimeline, 
-        onScroll, 
-        utils, 
-        animate, 
-        stagger 
-    } from './dist/modules/index.js';
+    <script type="module">
+        // SOVEREIGN IMPORT: Lokaler Pfad, keine Cloud.
+        import { 
+            animate, 
+            timeline, 
+            stagger, 
+            utils 
+        } from './dist/modules/index.js';
 
-    // Wenn das Modul lädt, verstecke Fehlermeldung
-    const errBox = document.getElementById('js-error');
-    if(errBox) errBox.style.display = 'none';
+        // --- KONFIGURATION ---
+        const CONFIG = {
+            tunnelDepth: 15000, // Maximale Tiefe (muss zur CSS height passen)
+            particleCount: 200,
+            gold: '#d4af37',
+            white: '#e5e4e2'
+        };
 
-    // --- 1. PARTIKEL ENGINE (ISONOMIE STROM) ---
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
+        // --- DOM ELEMENTE ---
+        const world = document.getElementById('tunnel-world');
+        const nodes = document.querySelectorAll('.node');
+        const canvas = document.getElementById('sovereign-field');
+        const ctx = canvas.getContext('2d');
+        const loader = document.getElementById('loading-overlay');
 
-    const resize = () => {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    };
-    window.addEventListener('resize', resize);
-    resize();
-
-    const particles = Array.from({length: 200}, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        size: Math.random() * 2 + 0.5,
-        alpha: Math.random() * 0.5,
-        baseX: Math.random() * w,
-        baseY: Math.random() * h,
-        speed: Math.random() * 0.5 + 0.2
-    }));
-
-    const renderParticles = () => {
-        ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#d4af37';
-        particles.forEach(p => {
-            ctx.globalAlpha = p.alpha;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-    };
-
-    // --- 2. TIMELINE CONFIGURATION ---
-    const layers = utils.$('.layer');
-    
-    // Φ FIX: Setze Opacity erst JETZT auf 0, nachdem JS erfolgreich geladen hat.
-    // Dies verhindert den "Black Screen", wenn JS abstürzt.
-    layers.forEach(el => el.style.opacity = 0);
-
-    const zStep = 3000; 
-    
-    // Initialisierung: Setze Layer tief in den Raum
-    layers.forEach((el, i) => {
-        utils.set(el, { translateZ: -i * zStep });
-    });
-
-    // Haupt-Timeline, gekoppelt an Scroll
-    const mainTL = createTimeline({
-        autoplay: onScroll({
-            target: 'body',
-            sync: 1,
-            debug: false, 
-            onUpdate: renderParticles 
-        })
-    });
-
-    const totalDistance = (layers.length - 1) * zStep;
-    
-    mainTL.add('#tunnel', {
-        translateZ: [0, totalDistance],
-        ease: 'linear'
-    }, 0);
-
-    // B) Layer Kinetik 
-    layers.forEach((el, i) => {
-        // Einblenden (Fade In)
-        // Φ FIX: Startzeitpunkt muss >= 0 sein. Wir nutzen i * 1000 ohne Offset für den Start.
-        mainTL.add(el, {
-            opacity: [0, 1],
-            scale: [0.6, 1],
-            filter: ['blur(20px)', 'blur(0px)'],
-            ease: 'out(1.618)',
-            duration: 1000
-        }, i * 1000); 
-
-        // Ausblenden (Fade Out) - Außer beim letzten Layer
-        if (i < layers.length - 1) {
-            mainTL.add(el, {
-                opacity: [1, 0],
-                scale: [1, 1.5], 
-                filter: ['blur(0px)', 'blur(40px)'],
-                ease: 'in(1.618)',
-                duration: 1000
-            }, (i * 1000) + 1200); // 1200ms Delay nach Einblenden
-        }
-    });
-
-    // --- 3. MOUSE PARALLAX (TIEFEN-ILLUSION) ---
-    window.addEventListener('mousemove', (e) => {
-        const x = (e.clientX / w - 0.5) * 2; 
-        const y = (e.clientY / h - 0.5) * 2;
-
-        animate('#tunnel', {
-            rotateY: x * 3, 
-            rotateX: -y * 3,
-            translateX: -x * 20, 
-            translateY: -y * 20,
-            duration: 1200,
-            ease: 'out(2)',
-            composition: 'blend'
+        // --- INITIALISIERUNG (Z-Positionierung) ---
+        // Wir setzen die Nodes initial via JS an ihre Z-Positionen,
+        // damit sie im 'Stasis'-Zustand (ohne JS) lesbar übereinander liegen würden (Fail-Safe),
+        // aber mit JS korrekt in den Raum verteilt werden.
+        nodes.forEach(node => {
+            const z = node.getAttribute('data-z');
+            node.style.transform = `translate(-50%, -50%) translateZ(${z}px)`;
+            // Initial unsichtbar machen, wir faden sie logisch ein
+            node.style.opacity = '0.3'; 
         });
 
-        particles.forEach(p => {
-            const moveX = p.baseX - (x * 50 * p.speed);
-            const moveY = p.baseY - (y * 50 * p.speed);
-            p.x += (moveX - p.x) * 0.1;
-            p.y += (moveY - p.y) * 0.1;
-        });
-    });
+        // Loader ausblenden
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 1000);
+        }, 500);
 
-    // --- 4. ANIMATIONS-LOOPS (Pulsieren) ---
-    animate('.pulse', {
-        scale: [1, 1.6],
-        opacity: [0.6, 0],
-        duration: 2500,
-        loop: true,
-        delay: stagger(500),
-        ease: 'out(2.5)'
-    });
 
-    animate('#intro div', {
-        translateY: [-10, 10],
-        opacity: [0.5, 1],
-        duration: 1500,
-        direction: 'alternate',
-        loop: true,
-        ease: 'inOutSine'
-    });
-
-    // --- 5. NAVIGATION LOGIK ---
-    window.scrollToLayer = (index) => {
-        const totalHeight = document.body.scrollHeight - window.innerHeight;
-        // Korrigierte Berechnung basierend auf der tatsächlichen Timeline-Logik
-        const fraction = index / (layers.length - 1); 
+        // --- ENGINE 1: SCROLLYTELLING (Der Tunnel) ---
+        // Wir koppeln die native Scroll-Position an die Z-Achse der Welt.
         
-        window.scrollTo({
-            top: totalHeight * fraction,
-            behavior: 'smooth'
-        });
-    };
+        let currentScroll = 0;
+        let targetScroll = 0;
 
-    mainTL.init();
-</script>
+        // Loop für geschmeidige Interpolation (Lerp)
+        function renderTunnel() {
+            targetScroll = window.scrollY;
+            
+            // Lerp für weiches Gefühl (0.1 Faktor)
+            currentScroll += (targetScroll - currentScroll) * 0.1;
+
+            // Die ganze Welt bewegt sich auf uns zu (-Z)
+            // Wir fügen Rotation hinzu für leichte Desorientierung/Dynamik
+            world.style.transform = `translateZ(${-currentScroll}px) rotateZ(${currentScroll * 0.002}deg)`;
+
+            // Opacity Logic: Elemente, die nah sind, leuchten auf
+            nodes.forEach(node => {
+                const nodeZ = parseInt(node.getAttribute('data-z'));
+                const distance = Math.abs(nodeZ - currentScroll);
+                
+                // Fokus-Bereich: +/- 500px um die Kamera
+                if(distance < 800) {
+                    const opacity = 1 - (distance / 800);
+                    node.style.opacity = Math.max(0, opacity);
+                    node.style.filter = `blur(${distance * 0.01}px)`;
+                } else {
+                    node.style.opacity = 0;
+                }
+            });
+
+            requestAnimationFrame(renderTunnel);
+        }
+        renderTunnel();
+
+
+        // --- ENGINE 2: PARTIKEL SYSTEM (Canvas) ---
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.z = Math.random() * 2; // Parallax Tiefe
+                this.size = Math.random() * 2;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                // Maus Parallax (simuliert)
+                // Hier könnte man echte Maus-Koordinaten einkoppeln
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Wrap around
+                if(this.x > width) this.x = 0;
+                if(this.x < 0) this.x = width;
+                if(this.y > height) this.y = 0;
+                if(this.y < 0) this.y = height;
+            }
+            draw() {
+                ctx.fillStyle = CONFIG.gold;
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Init Particles
+        for(let i=0; i < CONFIG.particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function renderParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Wenn wir schnell scrollen, verzerren sich die Partikel (Warp Speed Effekt)
+            // Hier simple Version:
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(renderParticles);
+        }
+        renderParticles();
+
+        // --- HAPTIK: Mouse Parallax ---
+        // Zusätzliche subtile Bewegung basierend auf Mausposition
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / width - 0.5) * 20; // -10 bis 10
+            const y = (e.clientY / height - 0.5) * 20;
+            
+            // Wir bewegen den Viewport leicht gegen die Maus
+            document.getElementById('tunnel-viewport').style.transform = 
+                `translateX(${-x}px) translateY(${-y}px)`;
+        });
+
+    </script>
 </body>
 </html>
