@@ -10,7 +10,7 @@
             --gold: #d4af37;
             --gold-bright: #ffd700;
             --platinum: #e5e4e2;
-            --glass: rgba(20, 20, 20, 0.85);
+            --glass: rgba(20, 20, 20, 0.95); /* Weniger Transparenz für Performance */
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -22,6 +22,7 @@
             font-family: var(--font-main);
             overflow-x: hidden;
             height: 16000px;
+            overscroll-behavior: none;
         }
 
         /* --- LAYER 0: CANVAS (PARTIKEL) --- */
@@ -39,32 +40,36 @@
             z-index: 1;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
+            /* GPU COMPOSITING LAYER ERZWINGEN */
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         #tunnel-world {
             position: absolute; width: 100%; height: 100%;
             transform-style: preserve-3d;
-            will-change: transform;
+            will-change: transform; /* Hint an Browser */
         }
 
         .node {
             position: absolute;
             top: 50%; left: 50%;
-            width: 80vw; max-width: 900px;
+            width: 80vw; max-width: 800px;
             text-align: center;
-            opacity: 0; 
+            opacity: 0;
+            display: none; /* Standardmäßig aus dem DOM-Flow nehmen */
             transform: translate(-50%, -50%);
-            backface-visibility: hidden;
+            will-change: transform, opacity;
         }
 
         /* FAIL SAFE */
         @noscript {
-            .node { position: relative; opacity: 1; margin: 100px auto; transform: none; }
+            .node { position: relative; opacity: 1; display: block; margin: 100px auto; transform: none; }
             body { height: auto; overflow-y: auto; }
             #tunnel-viewport { position: relative; perspective: none; }
         }
 
-        /* UI ELEMENTS */
+        /* UI ELEMENTS - Schatten reduziert für Performance */
         h1 {
             font-size: clamp(4rem, 8vw, 8rem);
             font-weight: 900;
@@ -73,7 +78,6 @@
             color: transparent;
             -webkit-text-stroke: 1px var(--gold);
             margin-bottom: 2rem;
-            text-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
         }
 
         h2 {
@@ -94,7 +98,6 @@
         p {
             font-size: 1.3rem; line-height: 1.8; color: var(--platinum);
             max-width: 650px; margin: 0 auto;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
 
         .media-slot {
@@ -102,22 +105,14 @@
             padding: 3rem;
             background: var(--glass);
             border: 1px solid rgba(212, 175, 55, 0.3);
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            transition: all 0.5s ease;
+            /* KEIN BACKDROP-FILTER (Performance Killer #1) */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             transform-style: preserve-3d;
-        }
-
-        .media-slot:hover {
-            border-color: var(--gold);
-            box-shadow: 0 0 80px rgba(212, 175, 55, 0.2);
-            transform: scale(1.02) translateZ(50px);
         }
 
         .icon {
             font-size: 5rem; display: block; margin-bottom: 1rem;
-            filter: drop-shadow(0 0 20px var(--gold));
-            animation: float 6s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
         /* Buttons */
@@ -131,15 +126,9 @@
             text-transform: uppercase;
             letter-spacing: 0.2em;
             font-size: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease; /* Simplere Transition */
         }
-        .btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: var(--gold); transition: left 0.3s ease; z-index: -1;
-        }
-        .btn:hover { color: var(--void); box-shadow: 0 0 30px var(--gold); }
-        .btn:hover::before { left: 0; }
+        .btn:hover { background: var(--gold); color: var(--void); }
 
         /* Scrollbar Hide */
         ::-webkit-scrollbar { width: 0; }
@@ -149,17 +138,14 @@
         #loader {
             position: fixed; inset: 0; background: var(--void); z-index: 999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
+            transition: opacity 0.5s ease;
         }
-        .loader-text { color: var(--gold); letter-spacing: 0.5em; animation: blink 2s infinite; }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes blink { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .loader-text { color: var(--gold); letter-spacing: 0.5em; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="loader-text">Φ | INITIALIZING...</div></div>
+    <div id="loader"><div class="loader-text">Φ | OPTIMIZING...</div></div>
 
     <canvas id="sovereign-field"></canvas>
 
@@ -176,7 +162,7 @@
 
             <section class="node" id="act-1" data-z="3500" data-act="order">
                 <span class="icon">🏛️</span>
-                <h2 class="stagger-text">Der Ursprung</h2>
+                <h2>Der Ursprung</h2>
                 <div class="media-slot">
                     <p><strong>[AUDIO: Aristoteles & Die Isonomie]</strong></p>
                     <br>
@@ -186,7 +172,7 @@
 
             <section class="node" id="act-2" data-z="7000" data-act="focus">
                 <span class="icon">⚖️</span>
-                <h2 class="stagger-text">Die Logik des Zufalls</h2>
+                <h2>Die Logik des Zufalls</h2>
                 <div class="media-slot">
                     <p><strong>[AUDIO: Wahl vs. Los]</strong></p>
                     <br>
@@ -196,7 +182,7 @@
 
             <section class="node" id="act-3" data-z="10500" data-act="chaos">
                 <span class="icon">🌪️</span>
-                <h2 class="stagger-text">Die Moderne Krise</h2>
+                <h2>Die Moderne Krise</h2>
                 <div class="media-slot">
                     <p><strong>[AUDIO: Gegen Wahlen]</strong></p>
                     <br>
@@ -206,8 +192,8 @@
 
             <section class="node" id="act-4" data-z="14000" data-act="glory">
                 <span class="icon">✨</span>
-                <h2 class="stagger-text">Demokratie 2.0</h2>
-                <div class="media-slot" style="border-color: var(--gold-bright); box-shadow: 0 0 100px rgba(212, 175, 55, 0.4);">
+                <h2>Demokratie 2.0</h2>
+                <div class="media-slot" style="box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);">
                     <p><strong>[VIDEO: Die Kinetische Isonomie]</strong></p>
                     <br>
                     <p>Keine Politiker mehr. Bürger. Verantwortung. Freiheit.<br>Das finale Bild.</p>
@@ -227,169 +213,151 @@
     </div>
 
     <script type="module">
-        import { animate, stagger, utils } from './dist/bundles/anime.esm.js';
+        import { animate, utils } from './dist/bundles/anime.esm.js';
 
-        // --- CONFIG & STATE ---
+        // --- CONFIG ---
         const CONFIG = {
-            depth: 16000,
-            particleCount: 300,
-            colors: { gold: '#d4af37', white: '#e5e4e2', void: '#050505' }
+            colors: { gold: '#d4af37', white: '#e5e4e2', void: '#050505' },
+            particleCount: 150, // Reduziert für Performance (reicht völlig aus)
+            renderDistance: 2500 // Frustum Culling Distanz
         };
 
         const STATE = {
             currentScroll: 0,
             activeAct: 'prolog',
-            scrollSpeed: 0
+            scrollSpeed: 0,
+            isScrolling: false
         };
 
-        // --- DOM ---
+        // --- DOM CACHE ---
         const world = document.getElementById('tunnel-world');
-        const nodes = document.querySelectorAll('.node');
+        const nodes = Array.from(document.querySelectorAll('.node')).map(el => ({
+            el,
+            z: parseInt(el.getAttribute('data-z')),
+            act: el.getAttribute('data-act'),
+            visible: false
+        }));
         const canvas = document.getElementById('sovereign-field');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true }); // Speed hacks
         let w, h;
 
-        // --- SETUP ---
+        // --- INIT ---
         function init() {
-            // Resize Canvas
-            const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
+            const resize = () => { 
+                w = canvas.width = window.innerWidth; 
+                h = canvas.height = window.innerHeight; 
+            };
             window.addEventListener('resize', resize);
             resize();
 
-            // Place Nodes in 3D Space
+            // Initiale Platzierung
             nodes.forEach(node => {
-                const z = parseInt(node.getAttribute('data-z'));
-                node.style.transform = `translate(-50%, -50%) translateZ(${z}px)`;
+                node.el.style.transform = `translate(-50%, -50%) translateZ(${node.z}px)`;
             });
 
-            // Remove Loader
-            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 1000);
-            setTimeout(() => { document.getElementById('loader').remove(); }, 2000);
-
-            // Trigger Start Animation on Prolog Text
-            animate(document.querySelector('#prolog h1'), {
-                opacity: [0, 1], scale: [0.8, 1], duration: 2000, easing: 'outExpo', delay: 1000
-            });
+            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 500);
+            setTimeout(() => { document.getElementById('loader').remove(); }, 1000);
         }
         init();
 
-
-        // --- PARTICLE SYSTEM (THE SOVEREIGN FIELD) ---
+        // --- PARTICLE SYSTEM (OPTIMIZED) ---
         class Particle {
-            constructor() {
-                this.init();
-            }
-
+            constructor() { this.init(); }
             init() {
                 this.x = Math.random() * w;
                 this.y = Math.random() * h;
-                this.z = Math.random() * 2; // Parallax Depth
-                this.size = Math.random() * 1.5 + 0.5;
-                this.baseVx = (Math.random() - 0.5) * 0.5;
-                this.baseVy = (Math.random() - 0.5) * 0.5;
-                this.vx = this.baseVx;
-                this.vy = this.baseVy;
-                this.alpha = Math.random() * 0.5 + 0.1;
+                this.size = Math.random() * 2 + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
                 this.color = CONFIG.colors.gold;
             }
-
             update(act, speed) {
-                // BEHAVIOR SWITCHER
-                let speedMult = 1 + (speed * 0.02);
+                // Simplifizierte Physik
+                let speedMult = 1 + (speed * 0.01);
+                
+                if (act === 'glory') this.color = '#ffffff';
+                else this.color = CONFIG.colors.gold;
 
-                if (act === 'prolog') {
-                    // Stasis
-                    this.vx = this.baseVx * 0.5;
-                    this.vy = this.baseVy * 0.5;
-                } 
-                else if (act === 'order') {
-                    // Aristoteles: Aufstieg
-                    this.vx = this.vx * 0.9 + (0 - this.vx) * 0.05; 
-                    this.vy = -1 * speedMult; 
+                if (act === 'chaos') {
+                    this.x += (Math.random() - 0.5) * 4;
+                    this.y += (Math.random() - 0.5) * 4;
+                } else {
+                    this.x += this.vx * speedMult;
+                    this.y += this.vy * speedMult;
                 }
-                else if (act === 'focus') {
-                    // Montesquieu: Fokus (Hör-Modus)
-                    const dx = w/2 - this.x;
-                    const dy = h/2 - this.y;
-                    this.vx += dx * 0.0001;
-                    this.vy += dy * 0.0001;
-                }
-                else if (act === 'chaos') {
-                    // Krise
-                    this.vx = (Math.random() - 0.5) * 5;
-                    this.vy = (Math.random() - 0.5) * 5;
-                    this.color = '#ff4444'; 
-                }
-                else if (act === 'glory') {
-                    // Vision: Video-Mode (Explosion)
-                    const dx = this.x - w/2;
-                    const dy = this.y - h/2;
-                    this.vx = dx * 0.02;
-                    this.vy = dy * 0.02;
-                    this.size = Math.random() * 3; 
-                    this.color = '#ffffff'; // Weißes Licht für das Video
-                }
-                else {
-                    this.vx = this.baseVx * speedMult;
-                    this.vy = this.baseVy * speedMult;
-                }
-
-                this.x += this.vx;
-                this.y += this.vy;
 
                 if(this.x > w) this.x = 0; if(this.x < 0) this.x = w;
                 if(this.y > h) this.y = 0; if(this.y < 0) this.y = h;
             }
-
             draw() {
                 ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.alpha;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
+                // PERFORMANCE HACK: fillRect ist schneller als arc
+                ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
-
         const particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
 
-        // --- MAIN LOOP ---
+        // --- MAIN RENDER LOOP ---
         let targetScroll = 0;
+        let isIdle = false;
 
         function render() {
             targetScroll = window.scrollY;
-            const delta = targetScroll - STATE.currentScroll;
-            STATE.currentScroll += delta * 0.08;
-            STATE.scrollSpeed = Math.abs(delta);
-
-            world.style.transform = `translateZ(${-STATE.currentScroll}px) rotateZ(${STATE.currentScroll * 0.002}deg)`;
-
-            let closestDist = Infinity;
-            let newActiveAct = STATE.activeAct;
-
-            nodes.forEach(node => {
-                const z = parseInt(node.getAttribute('data-z'));
-                const dist = Math.abs(z - STATE.currentScroll);
-                const actName = node.getAttribute('data-act');
-
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    if (dist < 1000) newActiveAct = actName;
+            
+            // IDLE DETECTION: Wenn wir nah am Ziel sind, weniger rechnen
+            if (Math.abs(targetScroll - STATE.currentScroll) < 0.1 && STATE.scrollSpeed < 0.1) {
+                STATE.currentScroll = targetScroll; // Snap to clean value
+                if (!isIdle) {
+                    isIdle = true;
+                    // Einmal final rendern für Schärfe
                 }
+            } else {
+                isIdle = false;
+                // Lerp Logic
+                STATE.currentScroll += (targetScroll - STATE.currentScroll) * 0.1;
+            }
+            
+            STATE.scrollSpeed = Math.abs(targetScroll - STATE.currentScroll);
 
-                if (dist < 1500) {
-                    const opacity = Math.max(0, 1 - (dist / 1200));
-                    node.style.opacity = opacity;
-                    node.style.filter = `blur(${dist * 0.01}px)`;
+            // 1. World Transform (Nur bewegen wenn nötig)
+            if (!isIdle || STATE.activeAct === 'chaos') {
+                world.style.transform = `translateZ(${-STATE.currentScroll}px)`;
+                
+                // 2. Node Logic (Frustum Culling)
+                let newActiveAct = STATE.activeAct;
+                
+                nodes.forEach(node => {
+                    const dist = Math.abs(node.z - STATE.currentScroll);
                     
-                    if (opacity > 0.8 && !node.classList.contains('animated')) {
-                        node.classList.add('animated');
-                    }
-                } else {
-                    node.style.opacity = 0;
-                }
-            });
-            STATE.activeAct = newActiveAct;
+                    // FRUSTUM CULLING: Nur rendern wenn in der Nähe
+                    if (dist < CONFIG.renderDistance) {
+                        if (!node.visible) {
+                            node.el.style.display = 'block';
+                            node.visible = true;
+                        }
+                        
+                        // Simple Opacity Calculation (Kein Blur!)
+                        const opacity = Math.max(0, 1 - (dist / 1500));
+                        node.el.style.opacity = opacity;
+                        
+                        // Scale Effekt (günstig für GPU)
+                        const scale = 0.8 + (opacity * 0.2);
+                        // Wir nutzen translate3d für Hardware Acceleration
+                        node.el.style.transform = `translate(-50%, -50%) translateZ(${node.z}px) scale(${scale})`;
 
+                        if (dist < 800) newActiveAct = node.act;
+
+                    } else {
+                        if (node.visible) {
+                            node.el.style.display = 'none'; // Aus dem Render-Tree entfernen
+                            node.visible = false;
+                        }
+                    }
+                });
+                STATE.activeAct = newActiveAct;
+            }
+
+            // 3. Particles immer rendern (für Lebendigkeit), aber effizient
             ctx.clearRect(0, 0, w, h);
             particles.forEach(p => {
                 p.update(STATE.activeAct, STATE.scrollSpeed);
@@ -399,12 +367,6 @@
             requestAnimationFrame(render);
         }
         render();
-
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX - w/2) * 0.01;
-            const y = (e.clientY - h/2) * 0.01;
-            canvas.style.transform = `translate(${-x}px, ${-y}px)`;
-        });
 
     </script>
 </body>
