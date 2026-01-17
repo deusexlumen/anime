@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Souveränität</title>
+    <title>DEMOKRATIE 2.0 | Kinetische Resonanz</title>
     <style>
         :root {
             --void: #050505;
             --gold: #d4af37;
+            --gold-light: #fadd80;
             --platinum: #e5e4e2;
-            --glass: rgba(10, 10, 10, 0.95);
+            --glass: rgba(10, 10, 10, 0.90);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -22,175 +23,238 @@
             overflow-x: hidden;
             height: 16000px;
             overscroll-behavior: none;
+            cursor: crosshair; /* Subtiles Design-Detail */
         }
 
-        /* --- LAYER 0: CANVAS (GPU ACCELERATED) --- */
+        /* --- LAYER 0: CANVAS --- */
         #sovereign-field {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 0; pointer-events: none;
+        }
+
+        /* --- LAYER 0.5: VIGNETTE (CINEMATIC LOOK) --- */
+        #vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, #000000 120%);
+            z-index: 1; pointer-events: none; opacity: 0.8;
         }
 
         /* --- LAYER 1: TUNNEL --- */
         #tunnel-viewport {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 800px;
-            z-index: 1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            perspective: 1000px; /* Tiefere Perspektive */
+            z-index: 2;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
-            /* GPU HACK */
-            transform: translateZ(0);
+            transform: translateZ(0); /* GPU Trigger */
         }
 
         #tunnel-world {
             position: absolute; width: 100%; height: 100%;
             transform-style: preserve-3d;
-            will-change: transform; /* Sagt dem Browser: Das hier bewegt sich ständig */
+            will-change: transform;
         }
 
         .node {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             width: 80vw; max-width: 800px;
             text-align: center;
             opacity: 0;
-            /* GPU HACK FÜR ALLE KINDER */
-            transform: translate3d(-50%, -50%, 0); 
-            backface-visibility: hidden;
+            /* GPU Optimization */
+            transform: translate3d(-50%, -50%, 0);
             will-change: opacity, transform;
+            backface-visibility: hidden;
         }
 
         /* FAIL SAFE */
         @noscript {
             .node { position: relative; opacity: 1; transform: none; margin: 100px auto; }
             body { height: auto; overflow-y: auto; }
+            #vignette { display: none; }
         }
 
-        /* UI ELEMENTS - CLEAN & FAST */
+        /* --- UI & TYPOGRAPHY --- */
         h1 {
-            font-size: clamp(4rem, 8vw, 8rem);
-            font-weight: 900;
+            font-size: clamp(3rem, 6vw, 8rem);
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--gold); /* Solid Color statt Stroke für Performance */
+            letter-spacing: 0.2em;
+            color: var(--gold);
             margin-bottom: 2rem;
+            line-height: 1.1;
         }
 
         h2 {
             font-size: 2.5rem;
             color: var(--gold);
             font-weight: 300;
-            letter-spacing: 0.05em;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--gold);
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
             display: inline-block;
+            overflow: hidden; /* Für Stagger Effect wichtig */
         }
-
-        p {
-            font-size: 1.3rem; line-height: 1.8; color: var(--platinum);
-            max-width: 650px; margin: 0 auto;
+        
+        .char {
+            display: inline-block;
+            transform-origin: bottom center;
         }
 
         .media-slot {
             margin-top: 3rem;
-            padding: 3rem;
+            padding: 2.5rem;
             background: var(--glass);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            /* Fake Lighting via Gradient statt Shadow = Performance */
+            background-image: radial-gradient(circle at top, rgba(212,175,55,0.05), transparent 70%);
+            transition: border-color 0.3s ease;
+        }
+
+        .media-slot:hover {
+            border-color: var(--gold);
+        }
+
+        p {
+            font-size: 1.2rem; line-height: 1.7; color: var(--platinum);
+            max-width: 600px; margin: 0 auto; opacity: 0.9;
+        }
+
+        .highlight { color: var(--gold); font-weight: bold; }
+
+        /* --- AUDIO VISUALIZER (CSS ONLY = FAST) --- */
+        .equalizer {
+            display: flex; gap: 4px; justify-content: center; align-items: flex-end;
+            height: 40px; margin-bottom: 1.5rem;
+        }
+        .bar {
+            width: 6px; background: var(--gold);
+            animation: bounce 1s infinite ease-in-out;
+        }
+        .bar:nth-child(1) { height: 20%; animation-duration: 0.8s; }
+        .bar:nth-child(2) { height: 60%; animation-duration: 1.2s; }
+        .bar:nth-child(3) { height: 100%; animation-duration: 1.0s; }
+        .bar:nth-child(4) { height: 50%; animation-duration: 0.9s; }
+        .bar:nth-child(5) { height: 30%; animation-duration: 1.1s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        /* --- VIDEO FRAME --- */
+        .video-frame {
             border: 1px solid var(--gold);
-            /* KEINE SCHATTEN (Shadows killen FPS) */
+            padding: 5px;
+            position: relative;
+        }
+        .video-placeholder {
+            width: 100%; aspect-ratio: 16/9;
+            background: #000;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--gold);
+            font-size: 3rem;
+            border: 1px solid rgba(212,175,55,0.2);
         }
 
-        .icon {
-            font-size: 5rem; display: block; margin-bottom: 1rem;
-        }
-
-        /* Buttons */
-        .btn-group { display: flex; gap: 2rem; justify-content: center; margin-top: 4rem; }
+        /* --- NAVIGATION --- */
         .btn {
-            padding: 1.2rem 3rem;
-            background: var(--void);
+            display: inline-block;
+            margin: 0 10px;
+            padding: 1rem 2.5rem;
             border: 1px solid var(--gold);
             color: var(--gold);
             text-decoration: none;
             text-transform: uppercase;
+            font-size: 0.8rem;
             letter-spacing: 0.2em;
-            font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
         .btn:hover { background: var(--gold); color: var(--void); }
 
-        /* Hide Scrollbar */
+        /* SCROLLBAR HIDE */
         ::-webkit-scrollbar { width: 0; }
         html { scrollbar-width: none; }
 
-        /* Loader */
+        /* LOADER */
         #loader {
-            position: fixed; inset: 0; background: var(--void); z-index: 999;
+            position: fixed; inset: 0; background: var(--void); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            color: var(--gold);
-            transition: opacity 0.3s;
+            transition: opacity 0.5s ease;
+        }
+        .loader-line {
+            width: 0%; height: 2px; background: var(--gold);
+            transition: width 0.5s ease;
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">Φ | SYNCING GPU...</div>
+    <div id="loader"><div class="loader-line"></div></div>
 
     <canvas id="sovereign-field"></canvas>
+    <div id="vignette"></div>
 
     <div id="tunnel-viewport">
         <div id="tunnel-world">
             
             <section class="node" id="prolog" data-z="0" data-act="prolog">
-                <h1>Stasis</h1>
+                <h1 class="stagger-target">Stasis</h1>
                 <p>Der politische Stau. Parteien als Gatekeeper.<br>Willkommen im Ende der Geschichte.</p>
-                <div style="margin-top: 5rem; opacity: 0.5; color: var(--gold);">▼ SCROLL TO DESCEND ▼</div>
+                <div style="margin-top: 6rem; opacity: 0.6; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--gold);">
+                    ▼ SCROLL TO DESCEND ▼
+                </div>
             </section>
 
             <section class="node" id="act-1" data-z="3500" data-act="order">
-                <span class="icon">🏛️</span>
-                <h2>Der Ursprung</h2>
+                <h2 class="stagger-target">Der Ursprung</h2>
                 <div class="media-slot">
-                    <p><strong>[AUDIO: Aristoteles & Die Isonomie]</strong></p>
+                    <div class="equalizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <p class="highlight">AUDIO: ARISTOTELES & ISONOMIE</p>
                     <br>
                     <p><i>"Wahlen sind oligarchisch.<br>Das Los ist demokratisch."</i></p>
                 </div>
             </section>
 
             <section class="node" id="act-2" data-z="7000" data-act="focus">
-                <span class="icon">⚖️</span>
-                <h2>Die Logik des Zufalls</h2>
+                <h2 class="stagger-target">Die Logik des Zufalls</h2>
                 <div class="media-slot">
-                    <p><strong>[AUDIO: Wahl vs. Los]</strong></p>
+                    <div class="equalizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <p class="highlight">AUDIO: WAHL vs. LOS</p>
                     <br>
-                    <p>Korruption durchbrechen. Kompetenz durch Diversität ersetzen.<br>Das Hören der Wahrheit.</p>
+                    <p>Korruption durchbrechen. <br>Kompetenz durch kognitive Diversität ersetzen.</p>
                 </div>
             </section>
 
             <section class="node" id="act-3" data-z="10500" data-act="chaos">
-                <span class="icon">🌪️</span>
-                <h2>Die Moderne Krise</h2>
+                <h2 class="stagger-target">Die Moderne Krise</h2>
                 <div class="media-slot">
-                    <p><strong>[AUDIO: Gegen Wahlen]</strong></p>
+                    <div class="equalizer" style="filter: hue-rotate(-30deg);">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <p class="highlight">AUDIO: GEGEN WAHLEN</p>
                     <br>
                     <p>Warum wir unsere Demokratie retten müssen,<br>indem wir sie neu erfinden.</p>
                 </div>
             </section>
 
             <section class="node" id="act-4" data-z="14000" data-act="glory">
-                <span class="icon">✨</span>
-                <h2>Demokratie 2.0</h2>
-                <div class="media-slot" style="border: 2px solid var(--gold);">
-                    <p><strong>[VIDEO: Die Kinetische Isonomie]</strong></p>
+                <h2 class="stagger-target">Demokratie 2.0</h2>
+                <div class="media-slot video-frame">
+                    <div class="video-placeholder">▶</div>
                     <br>
-                    <p>Keine Politiker mehr. Bürger. Verantwortung. Freiheit.<br>Das finale Bild.</p>
+                    <p class="highlight">VIDEO: DIE KINETISCHE ISONOMIE</p>
+                    <p style="font-size: 0.9rem; margin-top: 1rem;">Das Ende der Politiker.</p>
                 </div>
             </section>
 
             <section class="node" id="outro" data-z="16000" data-act="calm">
-                <h1>Souveränität</h1>
-                <p>Du bist am Grund angekommen. Baue neu.</p>
-                <div class="btn-group">
-                    <a href="#" class="btn">Manifest .PDF</a>
+                <h1 class="stagger-target">Souveränität</h1>
+                <p>Baue neu.</p>
+                <div style="margin-top: 4rem;">
+                    <a href="#" class="btn">MANIFEST.PDF</a>
                     <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="btn">NUTT LOS</a>
                 </div>
             </section>
@@ -199,132 +263,184 @@
     </div>
 
     <script type="module">
-        import { animate, utils } from './dist/bundles/anime.esm.js';
+        import { animate, stagger, utils } from './dist/bundles/anime.esm.js';
 
-        // --- CONFIG ---
+        // --- CONFIG & STATE ---
         const CONFIG = {
             colors: { gold: '#d4af37', white: '#e5e4e2' },
-            particleCount: 100, // Reduziert für Stabilität
+            particleCount: 120, // Sweet spot performance/look
             renderDistance: 3000
         };
 
-        // --- STATE ---
         const STATE = {
             currentScroll: 0,
             activeAct: 'prolog',
             scrollSpeed: 0
         };
 
-        // --- CACHED DOM ---
+        // --- SETUP ---
         const world = document.getElementById('tunnel-world');
-        const nodes = Array.from(document.querySelectorAll('.node')).map(el => ({
-            el,
-            z: parseInt(el.getAttribute('data-z')),
-            act: el.getAttribute('data-act'),
-            visible: false
-        }));
+        const nodes = Array.from(document.querySelectorAll('.node')).map(el => {
+            // Text Splitting Logic for Stagger Effect
+            const headline = el.querySelector('.stagger-target');
+            let chars = [];
+            if(headline) {
+                const text = headline.textContent;
+                headline.innerHTML = '';
+                text.split('').forEach(char => {
+                    const span = document.createElement('span');
+                    span.textContent = char === ' ' ? '\u00A0' : char;
+                    span.className = 'char';
+                    headline.appendChild(span);
+                    chars.push(span);
+                });
+            }
+
+            return {
+                el,
+                z: parseInt(el.getAttribute('data-z')),
+                act: el.getAttribute('data-act'),
+                visible: false,
+                animated: false,
+                chars: chars
+            };
+        });
+
         const canvas = document.getElementById('sovereign-field');
-        const ctx = canvas.getContext('2d', { alpha: false }); // Alpha false ist schneller
+        const ctx = canvas.getContext('2d', { alpha: false }); // Fast canvas
         let w, h;
 
         // --- INIT ---
         function init() {
-            const resize = () => { 
-                w = canvas.width = window.innerWidth; 
-                h = canvas.height = window.innerHeight; 
-            };
+            const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
             window.addEventListener('resize', resize);
             resize();
 
-            // Initiale statische Platzierung
+            // Initial positioning
             nodes.forEach(node => {
-                // translate3d erzwingt GPU layer
                 node.el.style.transform = `translate3d(-50%, -50%, ${node.z}px)`;
             });
 
-            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 200);
-            setTimeout(() => { document.getElementById('loader').remove(); }, 600);
+            // Loader Fake Progress
+            const loaderLine = document.querySelector('.loader-line');
+            loaderLine.style.width = '100%';
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = 0;
+                setTimeout(() => document.getElementById('loader').remove(), 500);
+            }, 800);
         }
         init();
 
-        // --- HIGH PERFORMANCE PARTICLES ---
+        // --- PARTICLE ENGINE ---
         class Particle {
             constructor() {
+                this.reset();
+            }
+            reset() {
                 this.x = Math.random() * w;
                 this.y = Math.random() * h;
                 this.size = Math.random() * 2 + 1;
                 this.vx = (Math.random() - 0.5) * 0.2;
                 this.vy = (Math.random() - 0.5) * 0.2;
+                this.life = Math.random();
             }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+            update(act, speed) {
+                // ACT BEHAVIOR
+                let speedMult = 1 + (speed * 0.05);
+                
+                if(act === 'chaos') {
+                    // Shake
+                    this.x += (Math.random() - 0.5) * 5;
+                    this.y += (Math.random() - 0.5) * 5;
+                } else if (act === 'glory') {
+                    // Expand
+                    const dx = this.x - w/2;
+                    const dy = this.y - h/2;
+                    this.x += dx * 0.01;
+                    this.y += dy * 0.01;
+                } else {
+                    // Drift
+                    this.x += this.vx * speedMult;
+                    this.y += this.vy * speedMult;
+                }
+
+                // Wrap
                 if(this.x > w) this.x = 0; if(this.x < 0) this.x = w;
                 if(this.y > h) this.y = 0; if(this.y < 0) this.y = h;
             }
             draw() {
-                // Zeichnen einfacher Rechtecke (schneller als Kreise)
+                // Flickering opacity cheap trick
+                const opacity = Math.random() > 0.95 ? 1 : 0.4;
+                ctx.fillStyle = STATE.activeAct === 'glory' ? `rgba(255,255,255,${opacity})` : `rgba(212,175,55,${opacity})`;
                 ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
         const particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
 
-        // --- THE LOOP (60 FPS GOAL) ---
+        // --- RENDER LOOP ---
         let targetScroll = 0;
 
         function render() {
             targetScroll = window.scrollY;
             
-            // Sehr einfaches LERP
+            // Lerp (0.1 = soft but responsive)
             STATE.currentScroll += (targetScroll - STATE.currentScroll) * 0.1;
-            
-            // 1. World Move (Ganze Welt schieben)
-            // Nutze toFixed(2) um Subpixel-Rendering Artefakte zu reduzieren
+            STATE.scrollSpeed = Math.abs(targetScroll - STATE.currentScroll);
+
+            // 1. Move World
             world.style.transform = `translate3d(0, 0, ${-STATE.currentScroll.toFixed(2)}px)`;
 
-            // 2. Node Visibility (Simple Math only)
-            // Keine DOM Manipulation außer opacity und visibility
+            // 2. Node Visibility & Animation
             let actFound = false;
 
             nodes.forEach(node => {
                 const dist = Math.abs(node.z - STATE.currentScroll);
                 
                 if (dist < CONFIG.renderDistance) {
-                    // Sichtbarkeitsberechnung
                     if (!node.visible) {
                         node.el.style.visibility = 'visible';
                         node.visible = true;
                     }
                     
-                    // Opacity
+                    // Simple Opacity Fade
                     let opacity = 0;
                     if (dist < 1000) opacity = 1 - (dist / 1000);
                     node.el.style.opacity = opacity.toFixed(2);
 
-                    if (dist < 500 && !actFound) {
+                    // TRIGGER TEXT STAGGER (Once per entry)
+                    if (opacity > 0.6 && !node.animated && node.chars.length > 0) {
+                        node.animated = true;
+                        animate(node.chars, {
+                            translateY: [20, 0],
+                            opacity: [0, 1],
+                            delay: stagger(30),
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        });
+                    }
+                    // Reset animation when far away to re-trigger later? 
+                    // No, keeping it triggered once feels more solid.
+
+                    if (dist < 600 && !actFound) {
                         STATE.activeAct = node.act;
                         actFound = true;
                     }
                 } else {
                     if (node.visible) {
-                        node.el.style.visibility = 'hidden'; // Besser als display:none
+                        node.el.style.visibility = 'hidden';
                         node.el.style.opacity = 0;
                         node.visible = false;
+                        node.animated = false; // Allow re-animation on return
                     }
                 }
             });
 
-            // 3. Canvas Render (Hintergrundfarbe löschen manuell)
+            // 3. Draw Particles (Manual Clear for speed)
             ctx.fillStyle = '#050505';
             ctx.fillRect(0, 0, w, h);
             
-            // Farbe basierend auf Akt
-            if (STATE.activeAct === 'glory') ctx.fillStyle = '#ffffff';
-            else if (STATE.activeAct === 'chaos') ctx.fillStyle = '#ff4444';
-            else ctx.fillStyle = '#d4af37';
-
             particles.forEach(p => {
-                p.update();
+                p.update(STATE.activeAct, STATE.scrollSpeed);
                 p.draw();
             });
 
