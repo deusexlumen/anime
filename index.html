@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Der Abstieg</title>
+    <title>DEMOKRATIE 2.0 | Die Wahrheit</title>
     <style>
         :root {
-            --void: #050505;
+            --void: #000000;
             --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.1);
-            --platinum: #e5e4e2;
-            --glass: rgba(15, 15, 15, 0.95);
-            --rust: #8a3324;
+            --gold-light: #fadd80;
+            --toxin: #8a2be2; /* Lila für den Bildungsadel */
+            --blood: #8a0a0a; /* Dunkelrot für den Parteien-Krieg */
+            --tech: #00f0ff; /* Cyan für technische Validierung */
+            --glass: rgba(10, 10, 10, 0.90);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -19,31 +20,33 @@
 
         body {
             background-color: var(--void);
-            color: var(--platinum);
+            color: #fff;
             font-family: var(--font-main);
             overflow-x: hidden;
-            height: 18000px;
+            height: 24000px; /* Massive Tiefe für Subliminals */
             overscroll-behavior: none;
-            cursor: default;
+            cursor: crosshair;
         }
 
-        /* --- LAYER 0: CANVAS --- */
+        /* --- LAYER 0: REACTIVE CANVAS --- */
         #sovereign-field {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 0; pointer-events: none;
+            transition: filter 1s ease;
         }
 
-        /* --- LAYER 0.5: VIGNETTE --- */
-        #vignette {
+        /* --- LAYER 0.5: NOISE & GLITCH OVERLAY --- */
+        #noise {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, #000000 140%);
-            z-index: 1; pointer-events: none; opacity: 0.7;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');
+            z-index: 1; pointer-events: none; opacity: 0.3;
+            mix-blend-mode: overlay;
         }
 
-        /* --- LAYER 1: TUNNEL --- */
+        /* --- LAYER 1: 3D TUNNEL --- */
         #tunnel-viewport {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 1200px;
+            perspective: 800px;
             z-index: 2;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
@@ -55,189 +58,198 @@
             will-change: transform;
         }
 
+        /* --- MAIN NODES (AUDIO STATIONS) --- */
         .node {
             position: absolute; top: 50%; left: 50%;
             width: 80vw; max-width: 900px;
             text-align: center;
             opacity: 0;
             transform: translate3d(-50%, -50%, 0);
-            will-change: opacity, transform;
             backface-visibility: hidden;
         }
 
-        /* FAIL SAFE */
-        @noscript {
-            .node { position: relative; opacity: 1; transform: none; margin: 150px auto; }
-            body { height: auto; overflow-y: auto; }
+        /* --- FLASH TEXT (SUBLIMINALS) --- */
+        .flash-text {
+            position: absolute; top: 50%; left: 50%;
+            font-size: 4rem; font-weight: 900; text-transform: uppercase;
+            color: rgba(255,255,255,0.15);
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.5rem;
+            transform-style: preserve-3d;
+            text-shadow: 0 0 20px rgba(0,0,0,1);
         }
 
-        /* --- TYPOGRAPHY --- */
+        /* --- UI DESIGN --- */
         h1 {
-            font-size: clamp(3rem, 6vw, 7rem);
-            font-weight: 300; text-transform: uppercase; letter-spacing: 0.3em;
-            color: var(--gold); margin-bottom: 2rem;
-            text-shadow: 0 0 40px var(--gold-dim);
+            font-size: clamp(4rem, 8vw, 10rem); font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--gold); line-height: 0.9; margin-bottom: 2rem;
+            text-shadow: 0 0 50px rgba(212,175,55,0.3);
         }
 
         h2 {
-            font-size: 2rem; color: var(--platinum); font-weight: 300; letter-spacing: 0.15em;
-            text-transform: uppercase; margin-bottom: 3rem; position: relative; display: inline-block;
+            font-size: 1.5rem; color: #888; letter-spacing: 0.3em;
+            text-transform: uppercase; margin-bottom: 3rem; border-bottom: 1px solid #444;
+            display: inline-block; padding-bottom: 10px;
         }
-        
-        h2::after {
-            content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 1px; background: var(--gold); transition: width 0.5s ease;
-        }
-        .node.active h2::after { width: 120px; }
 
-        .char { display: inline-block; opacity: 0; transform: translateY(20px); }
-
-        /* --- MEDIA SLOT (INTERACTIVE) --- */
-        .media-slot {
-            padding: 3rem;
-            background: var(--glass);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* --- MONOLITH PLAYER --- */
+        .monolith {
+            padding: 4rem;
+            background: rgba(5, 5, 5, 0.9);
+            border: 1px solid #333;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,1);
             position: relative; overflow: hidden; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .monolith::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px;
+            background: #333; transition: width 0.5s ease;
         }
 
-        .media-slot:hover {
-            border-color: rgba(212, 175, 55, 0.6);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
+        .monolith:hover {
+            border-color: #fff;
+            transform: scale(1.05) translateZ(50px);
         }
 
-        .media-slot.playing {
+        .monolith.playing {
             border-color: var(--gold);
-            background: rgba(20, 20, 20, 0.98);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 80px rgba(212,175,55,0.15);
+        }
+        .monolith.playing::after { background: var(--gold); box-shadow: 0 0 20px var(--gold); }
+
+        /* Crisis Mode Style */
+        .node[data-act="danger"] .monolith.playing { border-color: var(--blood); }
+        .node[data-act="danger"] .monolith.playing::after { background: var(--blood); box-shadow: 0 0 20px var(--blood); }
+
+        /* Truth Mode Style */
+        .node[data-act="solution"] .monolith.playing { border-color: #fff; }
+        .node[data-act="solution"] .monolith.playing::after { background: #fff; box-shadow: 0 0 20px #fff; }
+
+
+        .quote-main {
+            font-size: 1.4rem; line-height: 1.5; font-weight: 600; color: #fff;
+            margin-bottom: 1rem;
+        }
+        .quote-sub {
+            font-size: 1rem; color: #888; font-weight: 300;
         }
 
-        p {
-            font-size: 1.1rem; line-height: 1.8; color: var(--platinum); opacity: 0.9;
-            max-width: 600px; margin: 0 auto; font-weight: 300; letter-spacing: 0.05em;
-            pointer-events: none;
+        /* --- ENDCARD: THE HOLOGRAPHIC TABLE --- */
+        #hologram-table {
+            border: 1px solid var(--tech);
+            background: rgba(0, 240, 255, 0.05);
+            padding: 3rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(5px);
         }
+        .holo-item h3 { color: var(--tech); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .holo-item p { font-size: 0.9rem; color: #aaa; }
 
-        .label {
-            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em;
-            color: var(--gold); margin-bottom: 1.5rem; display: block;
-            pointer-events: none;
+        /* --- START OVERLAY --- */
+        #start-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer;
         }
-
-        /* --- EQUALIZER --- */
-        .equalizer {
-            display: flex; gap: 4px; justify-content: center; height: 30px; margin-bottom: 20px;
-            align-items: flex-end; opacity: 0.3; transition: opacity 0.3s;
+        .start-btn {
+            border: 2px solid #fff; padding: 2rem 5rem; color: #fff;
+            font-weight: 900; font-size: 1.2rem; letter-spacing: 0.5em;
+            transition: 0.2s; background: #000;
         }
-        .playing .equalizer { opacity: 1; }
-        
-        .bar { width: 3px; background: var(--gold); height: 5px; transition: height 0.2s ease; }
-        
-        .playing .bar { animation: eq 0.5s infinite ease-in-out alternate; }
-        .playing .bar:nth-child(1) { animation-delay: 0.1s; }
-        .playing .bar:nth-child(2) { animation-delay: 0.3s; }
-        .playing .bar:nth-child(3) { animation-delay: 0.0s; }
-        .playing .bar:nth-child(4) { animation-delay: 0.4s; }
-        .playing .bar:nth-child(5) { animation-delay: 0.2s; }
+        .start-btn:hover { background: #fff; color: #000; }
 
-        @keyframes eq { 0% { height: 5px; } 100% { height: 25px; } }
-
-        /* --- UI ELEMENTS --- */
-        .btn {
-            padding: 1.2rem 3rem; border: 1px solid var(--gold); color: var(--gold);
-            text-decoration: none; text-transform: uppercase; font-size: 0.8rem;
-            letter-spacing: 0.25em; transition: all 0.5s ease; background: transparent;
-        }
-        .btn:hover { background: var(--gold); color: var(--void); }
-
-        #loader {
-            position: fixed; inset: 0; background: var(--void); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
-        }
-        .loader-text { color: var(--gold); letter-spacing: 0.5em; animation: blink 2s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-
+        /* UTILS */
+        .hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="loader-text">Φ | INITIALIZING...</div></div>
+    <div id="start-overlay" onclick="startSystem()">
+        <div class="start-btn">ENTER SYSTEM</div>
+        <div style="margin-top: 20px; font-family: monospace; color: #444;">AUDIO REQUIRED</div>
+    </div>
 
     <canvas id="sovereign-field"></canvas>
-    <div id="vignette"></div>
+    <div id="noise"></div>
 
     <div id="tunnel-viewport">
         <div id="tunnel-world">
             
-            <section class="node" id="prolog" data-z="0" data-act="prolog">
-                <h1 class="stagger-text">Stasis</h1>
-                <p>Willkommen im Ende der Geschichte.<br>Der Stillstand ist politisch gewollt.</p>
-                <div style="margin-top: 8rem; opacity: 0.4; font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold);">
-                    SCROLL TO DESCEND
+            <div id="flash-container"></div>
+
+            <section class="node" data-z="0" data-act="prolog">
+                <h1>Stasis</h1>
+                <p class="quote-main" style="font-weight: 300; opacity: 0.7;">Wir leben in einer fortwährenden Aristokratie.</p>
+                <div style="margin-top: 10rem; font-size: 0.8rem; letter-spacing: 0.3em; opacity: 0.5;">SCROLL TO DESCEND</div>
+            </section>
+
+            <section class="node" data-z="4000" data-act="illusion">
+                <h2>Phase I: Die Täuschung</h2>
+                <audio id="audio-1" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" crossorigin="anonymous"></audio>
+                <div class="monolith" onclick="toggleAudio('audio-1', this)">
+                    <div class="quote-main">"Bildungsideale sind die Geißel der Menschheit."</div>
+                    <div class="quote-sub">Wie wir einen neuen Adel schufen, statt Menschen zu befreien.</div>
+                    <div style="margin-top: 2rem; color: var(--toxin); font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY FILE 01</div>
                 </div>
             </section>
 
-            <section class="node" id="act-1" data-z="4000" data-act="order">
-                <h2 class="stagger-text">Die Illusion</h2>
-                <audio id="audio-1" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" preload="auto"></audio>
-                
-                <div class="media-slot" onclick="toggleAudio('audio-1', this)">
-                    <div class="equalizer">
-                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <section class="node" data-z="8000" data-act="danger">
+                <h2 style="color: var(--blood); border-color: var(--blood);">Phase II: Der Brand</h2>
+                <audio id="audio-2" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" crossorigin="anonymous"></audio>
+                <div class="monolith" onclick="toggleAudio('audio-2', this)">
+                    <div class="quote-main" style="color: var(--blood);">"Parteien sind Brandbeschleuniger für Diktaturen."</div>
+                    <div class="quote-sub">Der Kampf um die Macht gebiert Tyrannei. Wahlen verhindern das nicht.</div>
+                    <div style="margin-top: 2rem; color: var(--blood); font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY WARNING</div>
+                </div>
+            </section>
+
+            <section class="node" data-z="12000" data-act="void">
+                <h2>Phase III: Der Unbegriff</h2>
+                <audio id="audio-3" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" crossorigin="anonymous"></audio>
+                <div class="monolith" onclick="toggleAudio('audio-3', this)">
+                    <div class="quote-main">"Politiker machen keine Politik."</div>
+                    <div class="quote-sub">Wir haben eine unpolitische Gesellschaft erschaffen, verwaltet von Dienstleistern.</div>
+                    <div style="margin-top: 2rem; font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY FILE 03</div>
+                </div>
+            </section>
+
+            <section class="node" data-z="16000" data-act="solution">
+                <h1 style="font-size: 6rem; text-shadow: 0 0 80px rgba(255,255,255,0.8);">Souveränität</h1>
+                <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" crossorigin="anonymous"></audio>
+                <div class="monolith" onclick="toggleAudio('audio-4', this)" style="background: rgba(255,255,255,0.1); border-color: #fff;">
+                    <div class="quote-main" style="color: #fff;">"Der einzige Schutz vor Faschismus."</div>
+                    <div class="quote-sub">Wenn alle herrschen, herrscht niemand über uns. Das ist Isonomie.</div>
+                    <div style="margin-top: 2rem; color: #fff; font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY MANIFESTO</div>
+                </div>
+            </section>
+
+            <section class="node" data-z="20000" data-act="matrix">
+                <h2 style="color: var(--tech); border-color: var(--tech);">System Validierung</h2>
+                <div id="hologram-table">
+                    <div class="holo-item">
+                        <h3>X-Road</h3>
+                        <p>Dezentraler Datenaustausch (Estland Modell).<br>Keine zentrale Schwachstelle.</p>
                     </div>
-                    <span class="label">▶ Play Audio-Log 01</span>
-                    <p>Warum Politiker eigentlich keine Politik machen.</p>
-                </div>
-            </section>
-
-            <section class="node" id="act-2" data-z="8000" data-act="focus">
-                <h2 class="stagger-text">Die Oligarchie</h2>
-                <audio id="audio-2" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" preload="auto"></audio>
-
-                <div class="media-slot" onclick="toggleAudio('audio-2', this)">
-                    <div class="equalizer">
-                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="holo-item">
+                        <h3>KSI Blockchain</h3>
+                        <p>Unbestechliche Integrität aller Los-Verfahren.<br>Mathematisch verifiziert.</p>
                     </div>
-                    <span class="label">▶ Play Audio-Log 02</span>
-                    <p>Wie Bildung einen neuen Adel schafft.</p>
-                </div>
-            </section>
-
-            <section class="node" id="act-3" data-z="12000" data-act="chaos">
-                <h2 class="stagger-text" style="color: #bf4040;">Der Brand</h2>
-                <audio id="audio-3" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" preload="auto"></audio>
-
-                <div class="media-slot" onclick="toggleAudio('audio-3', this)" style="border-color: rgba(191, 64, 64, 0.3);">
-                    <div class="equalizer">
-                        <div class="bar" style="background: #bf4040;"></div><div class="bar" style="background: #bf4040;"></div>
-                        <div class="bar" style="background: #bf4040;"></div><div class="bar" style="background: #bf4040;"></div>
+                    <div class="holo-item">
+                        <h3>eIDAS</h3>
+                        <p>EU-konforme digitale Identität.<br>Souveräner Bürger-Login.</p>
                     </div>
-                    <span class="label" style="color: #bf4040;">▶ Play System Warning</span>
-                    <p>Parteien als historischer Brandbeschleuniger für Diktaturen.</p>
-                </div>
-            </section>
-
-            <section class="node" id="act-4" data-z="16000" data-act="glory">
-                <h1 class="stagger-text">Die Lösung</h1>
-                <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" preload="auto"></audio>
-
-                <div class="media-slot" onclick="toggleAudio('audio-4', this)" style="border: 1px solid var(--gold); box-shadow: 0 0 50px rgba(212,175,55,0.1);">
-                    <div class="equalizer">
-                        <div class="bar" style="background: #fff;"></div><div class="bar" style="background: #fff;"></div>
-                        <div class="bar" style="background: #fff;"></div><div class="bar" style="background: #fff;"></div>
+                    <div class="holo-item">
+                        <h3>Drand Beacon</h3>
+                        <p>Öffentlich prüfbarer Zufall.<br>Manipulation unmöglich.</p>
                     </div>
-                    <span class="label" style="color: #fff;">▶ Play Manifesto</span>
-                    <p style="color: #fff;">Losdemokratie als einziger Schutz vor Faschismus.</p>
                 </div>
-            </section>
-
-            <section class="node" id="outro" data-z="19000" data-act="calm">
-                <h2 class="stagger-text">Souveränität</h2>
-                <div style="margin-top: 3rem; display: flex; gap: 20px; justify-content: center;">
-                    <a href="#" class="btn">Manifest</a>
-                    <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="btn">YouTube</a>
+                <div style="margin-top: 4rem; display: flex; justify-content: center; gap: 2rem;">
+                    <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="start-btn" style="font-size: 0.8rem; padding: 1.5rem 3rem; text-decoration: none; border-color: var(--tech); color: var(--tech);">MATRIX PDF</a>
+                    <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="start-btn" style="font-size: 0.8rem; padding: 1.5rem 3rem; text-decoration: none;">YOUTUBE</a>
                 </div>
             </section>
 
@@ -245,91 +257,107 @@
     </div>
 
     <script type="module">
-        import { animate, stagger, utils } from './dist/bundles/anime.esm.js';
+        import { animate, utils } from './dist/bundles/anime.esm.js';
 
-        // --- CONFIG ---
+        // --- CONFIGURATION ---
         const CONFIG = {
-            colors: { gold: '#d4af37', white: '#e5e4e2', rust: '#8a3324' },
-            particleCount: 100,
-            renderDistance: 3500,
-            scrollLerp: 0.06
+            scrollLerp: 0.05, // Heavy Cinematic Feel
+            particleCount: 180,
+            flashTexts: [
+                { text: "NEUER ADEL", z: 2000, x: -400, y: -200 },
+                { text: "GEISSEL DER MENSCHHEIT", z: 3000, x: 300, y: 100 },
+                { text: "TYRANNEI", z: 6000, x: -200, y: -300 },
+                { text: "PARTEIEN SIND SINNLOS", z: 7000, x: 200, y: 0 },
+                { text: "BRANDBESCHLEUNIGER", z: 7500, x: 0, y: 300 },
+                { text: "UNPOLITISCHE GESELLSCHAFT", z: 10000, x: -300, y: -100 },
+                { text: "DIENSTLEISTER", z: 11000, x: 400, y: 200 },
+                { text: "SCHUTZ VOR FASCHISMUS", z: 14000, x: 0, y: -200 },
+                { text: "WIR REGIEREN UNS", z: 15000, x: -200, y: 200 },
+                { text: "ISONOMIE", z: 15500, x: 0, y: 0 }
+            ]
         };
 
         const STATE = {
-            currentScroll: 0,
+            scroll: 0,
             targetScroll: 0,
-            activeAct: 'prolog',
-            currentlyPlaying: null
+            act: 'prolog',
+            audioCtx: null,
+            analyser: null,
+            dataArray: null,
+            bass: 0
         };
 
-        // --- DOM ---
+        // --- DOM REFS ---
         const world = document.getElementById('tunnel-world');
         const canvas = document.getElementById('sovereign-field');
         const ctx = canvas.getContext('2d', { alpha: false });
         let w, h;
 
-        // --- AUDIO ENGINE ---
-        window.toggleAudio = function(id, element) {
-            const audio = document.getElementById(id);
-            const label = element.querySelector('.label');
-            const originalText = label.innerText.replace('⏸ Pause', '▶ Play').replace('▶ Play', '▶ Play');
+        // --- FLASH TEXT ENGINE ---
+        function initFlashTexts() {
+            const container = document.getElementById('flash-container');
+            CONFIG.flashTexts.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'flash-text';
+                el.textContent = item.text;
+                // Initial placement
+                el.setAttribute('data-z', item.z);
+                el.setAttribute('data-x', item.x);
+                el.setAttribute('data-y', item.y);
+                // Style variations based on Act
+                if(item.z > 6000 && item.z < 9000) el.style.color = 'rgba(138, 10, 10, 0.2)'; // Blood for crisis
+                container.appendChild(el);
+            });
+        }
 
-            // Toggle Logic
-            if (!audio.paused) {
-                audio.pause();
-                element.classList.remove('playing');
-                label.innerText = originalText;
-                STATE.currentlyPlaying = null;
-            } else {
-                // Stop others
-                document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
-                document.querySelectorAll('.media-slot').forEach(el => {
-                    el.classList.remove('playing');
-                    const l = el.querySelector('.label');
-                    if(l) l.innerText = l.innerText.replace('⏸ Pause', '▶ Play');
-                });
+        // --- SYSTEM START ---
+        window.startSystem = function() {
+            STATE.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            STATE.analyser = STATE.audioCtx.createAnalyser();
+            STATE.analyser.fftSize = 256;
+            STATE.dataArray = new Uint8Array(STATE.analyser.frequencyBinCount);
 
-                // Play this
-                audio.play();
-                element.classList.add('playing');
-                label.innerText = originalText.replace('▶ Play', '⏸ Pause');
-                STATE.currentlyPlaying = id;
-            }
+            // Audio Nodes Connect
+            document.querySelectorAll('audio').forEach(el => {
+                const src = STATE.audioCtx.createMediaElementSource(el);
+                src.connect(STATE.analyser);
+                STATE.analyser.connect(STATE.audioCtx.destination);
+            });
+
+            // UI Fade
+            const ol = document.getElementById('start-overlay');
+            ol.style.opacity = 0;
+            setTimeout(() => ol.remove(), 1000);
+            
+            loop();
         };
 
-        // --- SETUP ---
-        const nodes = Array.from(document.querySelectorAll('.node')).map(el => {
-            const headlines = el.querySelectorAll('.stagger-text');
-            let animatables = [];
-            headlines.forEach(hl => {
-                const text = hl.textContent;
-                hl.innerHTML = '';
-                text.split('').forEach(char => {
-                    const span = document.createElement('span');
-                    span.textContent = char === ' ' ? '\u00A0' : char;
-                    span.className = 'char';
-                    hl.appendChild(span);
-                    animatables.push(span);
-                });
-            });
-            return {
-                el,
-                z: parseInt(el.getAttribute('data-z')),
-                act: el.getAttribute('data-act'),
-                animatables,
-                visible: false,
-                animated: false
-            };
-        });
+        window.toggleAudio = function(id, el) {
+            if(STATE.audioCtx.state === 'suspended') STATE.audioCtx.resume();
+            
+            const audio = document.getElementById(id);
+            if(!audio.paused) {
+                audio.pause();
+                el.classList.remove('playing');
+            } else {
+                document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+                document.querySelectorAll('.monolith').forEach(m => m.classList.remove('playing'));
+                audio.play();
+                el.classList.add('playing');
+            }
+        };
 
         // --- INIT ---
         function init() {
             const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
             window.addEventListener('resize', resize);
             resize();
-            nodes.forEach(node => { node.el.style.transform = `translate3d(-50%, -50%, ${node.z}px)`; });
-            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 500);
-            setTimeout(() => { document.getElementById('loader').remove(); }, 1500);
+            initFlashTexts();
+            
+            // Node Placement
+            document.querySelectorAll('.node').forEach(n => {
+                n.style.transform = `translate3d(-50%, -50%, ${n.getAttribute('data-z')}px)`;
+            });
         }
         init();
 
@@ -338,90 +366,115 @@
             constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * w; this.y = Math.random() * h;
-                this.size = Math.random() * 1.5 + 0.5;
-                this.speed = Math.random() * 0.2 + 0.05;
-                this.alpha = Math.random() * 0.5 + 0.1;
-                this.wobble = Math.random() * Math.PI * 2;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5 + 0.1;
+                this.z = Math.random() * 1000; // Fake depth
             }
-            update(act) {
-                this.y -= this.speed;
-                this.x += Math.sin(this.wobble) * 0.1;
-                this.wobble += 0.01;
-                if(act === 'chaos') this.x += (Math.random() - 0.5) * 1;
+            update() {
+                // Audio Reactivity
+                const boost = STATE.bass > 100 ? (STATE.bass / 255) * 5 : 0;
+                
+                // Act Behavior
+                if(STATE.act === 'danger') {
+                    this.x += (Math.random() - 0.5) * (5 + boost * 10); // Shake
+                    this.y += (Math.random() - 0.5) * (5 + boost * 10);
+                } else if (STATE.act === 'solution') {
+                    // Geometric Order (Up)
+                    this.y -= (this.speed + boost);
+                } else {
+                    // Drift
+                    this.y -= this.speed;
+                }
+
                 if(this.y < 0) this.y = h;
+                if(this.x < 0) this.x = w; if(this.x > w) this.x = 0;
             }
-            draw(color) {
-                ctx.fillStyle = color; ctx.globalAlpha = this.alpha;
-                ctx.fillRect(this.x, this.y, this.size, this.size);
+            draw(ctx, color) {
+                ctx.fillStyle = color;
+                const s = this.size + (STATE.bass / 255 * 2);
+                ctx.fillRect(this.x, this.y, s, s);
             }
         }
-        const particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
+        const particles = Array.from({length: CONFIG.particleCount}, () => new Particle());
 
-        // --- LOOP ---
-        function render() {
+        // --- RENDER ENGINE ---
+        function loop() {
             STATE.targetScroll = window.scrollY;
-            STATE.currentScroll += (STATE.targetScroll - STATE.currentScroll) * CONFIG.scrollLerp;
+            STATE.scroll += (STATE.targetScroll - STATE.scroll) * CONFIG.scrollLerp;
 
-            world.style.transform = `translate3d(0, 0, ${-STATE.currentScroll.toFixed(2)}px)`;
+            // Audio Analysis
+            if(STATE.analyser) {
+                STATE.analyser.getByteFrequencyData(STATE.dataArray);
+                STATE.bass = STATE.dataArray[10]; // Low freq
+            }
 
-            let closestDist = Infinity;
-            
-            nodes.forEach(node => {
-                const dist = Math.abs(node.z - STATE.currentScroll);
-                if(dist < closestDist) { closestDist = dist; STATE.activeAct = node.act; }
+            // 1. Move World (Act 2 Shake Effect)
+            let shakeX = 0, shakeY = 0;
+            if(STATE.act === 'danger') {
+                shakeX = (Math.random() - 0.5) * (STATE.bass / 50);
+                shakeY = (Math.random() - 0.5) * (STATE.bass / 50);
+            }
+            world.style.transform = `translate3d(${shakeX}px, ${shakeY}px, ${-STATE.scroll.toFixed(2)}px)`;
 
-                // SMART FADE: Audio leiser machen, wenn man wegscrollt
-                if (STATE.currentlyPlaying) {
-                    const audioEl = document.getElementById(STATE.currentlyPlaying);
-                    const parentNode = audioEl.closest('.node');
-                    const parentZ = parseInt(parentNode.getAttribute('data-z'));
-                    const audioDist = Math.abs(parentZ - STATE.currentScroll);
-                    
-                    if (audioDist > 1200 && !audioEl.paused) {
-                        if(audioEl.volume > 0.02) audioEl.volume -= 0.02;
-                        else {
-                            audioEl.pause();
-                            audioEl.volume = 1;
-                            const slot = parentNode.querySelector('.media-slot');
-                            slot.classList.remove('playing');
-                            slot.querySelector('.label').innerText = slot.querySelector('.label').innerText.replace('⏸ Pause', '▶ Play');
-                            STATE.currentlyPlaying = null;
-                        }
+            // 2. Process Flash Texts
+            document.querySelectorAll('.flash-text').forEach(el => {
+                const z = parseInt(el.getAttribute('data-z'));
+                const x = parseInt(el.getAttribute('data-x'));
+                const y = parseInt(el.getAttribute('data-y'));
+                
+                // Absolute placement in tunnel
+                // Trick: Flash Texts are static children of world, so they move with world.
+                // We just place them initially.
+                el.style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, ${z}px)`;
+                
+                // Visibility Culling
+                const dist = Math.abs(z - STATE.scroll);
+                if(dist < 2000) el.style.opacity = 1 - (dist / 2000);
+                else el.style.opacity = 0;
+            });
+
+            // 3. Process Nodes & Act Detection
+            let closest = Infinity;
+            document.querySelectorAll('.node').forEach(node => {
+                const z = parseInt(node.getAttribute('data-z'));
+                const dist = Math.abs(z - STATE.scroll);
+                
+                if(dist < closest) { closest = dist; STATE.act = node.getAttribute('data-act'); }
+
+                // Auto Fade Out Audio
+                if(dist > 1500) {
+                    const audio = node.querySelector('audio');
+                    if(audio && !audio.paused) {
+                        audio.volume *= 0.9;
+                        if(audio.volume < 0.05) { audio.pause(); audio.volume = 1; node.querySelector('.monolith').classList.remove('playing'); }
                     }
                 }
 
-                if (dist < CONFIG.renderDistance) {
-                    if (!node.visible) { node.el.style.visibility = 'visible'; node.visible = true; }
-                    
-                    const opacity = Math.max(0, 1 - (dist / 2000));
-                    node.el.style.opacity = opacity.toFixed(2);
-
-                    if (opacity > 0.5 && !node.animated) {
-                        node.animated = true;
-                        node.el.classList.add('active');
-                        if(node.animatables.length > 0) {
-                            animate(node.animatables, {
-                                translateY: [30, 0], opacity: [0, 1],
-                                delay: stagger(40), duration: 1200, easing: 'easeOutExpo'
-                            });
-                        }
-                    }
+                // Opacity logic
+                if(dist < 3000) {
+                    node.style.visibility = 'visible';
+                    node.style.opacity = 1 - (dist/2500);
                 } else {
-                    if (node.visible) { node.el.style.visibility = 'hidden'; node.visible = false; node.animated = false; }
+                    node.style.visibility = 'hidden';
                 }
             });
 
-            // Canvas Colors
-            let pColor = CONFIG.colors.gold;
-            if (STATE.activeAct === 'chaos') pColor = CONFIG.colors.rust;
-            else if (STATE.activeAct === 'glory') pColor = CONFIG.colors.white;
+            // 4. Render Canvas & Atmosphere
+            let color = CONFIG.colors.gold;
+            if(STATE.act === 'illusion') color = '#8a2be2';
+            else if(STATE.act === 'danger') color = '#8a0a0a';
+            else if(STATE.act === 'solution') color = '#ffffff';
+            else if(STATE.act === 'matrix') color = '#00f0ff';
 
-            ctx.fillStyle = '#050505'; ctx.globalAlpha = 1; ctx.fillRect(0, 0, w, h);
-            particles.forEach(p => { p.update(STATE.activeAct); p.draw(pColor); });
+            ctx.fillStyle = '#000000';
+            ctx.globalAlpha = 0.8; // Trail effect
+            ctx.fillRect(0,0,w,h);
+            ctx.globalAlpha = 1;
 
-            requestAnimationFrame(render);
+            particles.forEach(p => { p.update(); p.draw(ctx, color); });
+
+            requestAnimationFrame(loop);
         }
-        render();
 
     </script>
 </body>
