@@ -1,8 +1,8 @@
 /**
  * Anime.js - animation - CJS
- * @version v4.2.2
+ * @version v4.3.1
  * @license MIT
- * @copyright 2025 - Julian Garnier
+ * @copyright 2026 - Julian Garnier
  */
 
 'use strict';
@@ -60,6 +60,7 @@ const fastSetValuesArray = [null, null];
 const keyObjectTarget = { to: null };
 
 let tweenId = 0;
+let JSAnimationId = 0;
 let keyframes;
 /** @type {TweenParamsOptions & TweenValues} */
 let key;
@@ -174,6 +175,8 @@ class JSAnimation extends timer.Timer {
 
     super(/** @type {TimerParams & AnimationParams} */(parameters), parent, parentPosition);
 
+    ++JSAnimationId;
+
     const parsedTargets = targets.registerTargets(targets$1);
     const targetsLength = parsedTargets.length;
 
@@ -183,6 +186,7 @@ class JSAnimation extends timer.Timer {
     const params = /** @type {AnimationParams} */(kfParams ? helpers.mergeObjects(generateKeyframes(/** @type {DurationKeyframes} */(kfParams), parameters), parameters) : parameters);
 
     const {
+      id,
       delay,
       duration,
       ease,
@@ -193,11 +197,12 @@ class JSAnimation extends timer.Timer {
     } = params;
 
     const animDefaults = parent ? parent.defaults : globals.globals.defaults;
-    const animaPlaybackEase = values.setValue(playbackEase, animDefaults.playbackEase);
-    const animEase = animaPlaybackEase ? parser.parseEase(animaPlaybackEase) : null;
-    const hasSpring = !helpers.isUnd(ease) && !helpers.isUnd(/** @type {Spring} */(ease).ease);
-    const tEasing = hasSpring ? /** @type {Spring} */(ease).ease : values.setValue(ease, animEase ? 'linear' : animDefaults.ease);
-    const tDuration = hasSpring ? /** @type {Spring} */(ease).settlingDuration : values.setValue(duration, animDefaults.duration);
+    const animEase = values.setValue(ease, animDefaults.ease);
+    const animPlaybackEase = values.setValue(playbackEase, animDefaults.playbackEase);
+    const parsedAnimPlaybackEase = animPlaybackEase ? parser.parseEase(animPlaybackEase) : null;
+    const hasSpring = !helpers.isUnd(/** @type {Spring} */(animEase).ease);
+    const tEasing = hasSpring ? /** @type {Spring} */(animEase).ease : values.setValue(ease, parsedAnimPlaybackEase ? 'linear' : animDefaults.ease);
+    const tDuration = hasSpring ? /** @type {Spring} */(animEase).settlingDuration : values.setValue(duration, animDefaults.duration);
     const tDelay = values.setValue(delay, animDefaults.delay);
     const tModifier = modifier || animDefaults.modifier;
     // If no composition is defined and the targets length is high (>= 1000) set the composition to 'none' (0) for faster tween creation
@@ -205,7 +210,7 @@ class JSAnimation extends timer.Timer {
     // const absoluteOffsetTime = this._offset;
     const absoluteOffsetTime = this._offset + (parent ? parent._offset : 0);
     // This allows targeting the current animation in the spring onComplete callback
-    if (hasSpring) /** @type {Spring} */(ease).parent = this;
+    if (hasSpring) /** @type {Spring} */(animEase).parent = this;
 
     let iterationDuration = NaN;
     let iterationDelay = NaN;
@@ -302,10 +307,13 @@ class JSAnimation extends timer.Timer {
               tweenToValue = computedToValue;
             }
             const tweenFromValue = values.getFunctionValue(key.from, target, ti, tl);
-            const keyEasing = key.ease;
+            const easeToParse = key.ease || tEasing;
+
+            const easeFunctionResult = values.getFunctionValue(easeToParse, target, ti, tl);
+            const keyEasing = helpers.isFnc(easeFunctionResult) || helpers.isStr(easeFunctionResult) ? easeFunctionResult : easeToParse;
+
             const hasSpring = !helpers.isUnd(keyEasing) && !helpers.isUnd(/** @type {Spring} */(keyEasing).ease);
-            // Easing are treated differently and don't accept function based value to prevent having to pass a function wrapper that returns an other function all the time
-            const tweenEasing = hasSpring ? /** @type {Spring} */(keyEasing).ease : keyEasing || tEasing;
+            const tweenEasing = hasSpring ? /** @type {Spring} */(keyEasing).ease : keyEasing;
             // Calculate default individual keyframe duration by dividing the tl of keyframes
             const tweenDuration = hasSpring ? /** @type {Spring} */(keyEasing).settlingDuration : values.getFunctionValue(values.setValue(key.duration, (l > 1 ? values.getFunctionValue(tDuration, target, ti, tl) / l : tDuration)), target, ti, tl);
             // Default delay value should only be applied to the first tween
@@ -349,6 +357,8 @@ class JSAnimation extends timer.Timer {
             if (isFromToValue) {
               values.decomposeRawValue(isFromToArray ? values.getFunctionValue(tweenToValue[0], target, ti, tl) : tweenFromValue, fromTargetObject);
               values.decomposeRawValue(isFromToArray ? values.getFunctionValue(tweenToValue[1], target, ti, tl, toFunctionStore) : tweenToValue, toTargetObject);
+              // Needed to force an inline style registration
+              const originalValue = values.getOriginalAnimatableValue(target, propName, tweenType, inlineStylesStore);
               if (fromTargetObject.t === consts.valueTypes.NUMBER) {
                 if (prevSibling) {
                   if (prevSibling._valueType === consts.valueTypes.UNIT) {
@@ -357,7 +367,7 @@ class JSAnimation extends timer.Timer {
                   }
                 } else {
                   values.decomposeRawValue(
-                    values.getOriginalAnimatableValue(target, propName, tweenType, inlineStylesStore),
+                    originalValue,
                     values.decomposedOriginalValue
                   );
                   if (values.decomposedOriginalValue.t === consts.valueTypes.UNIT) {
@@ -576,12 +586,14 @@ class JSAnimation extends timer.Timer {
     }
     /** @type {TargetsArray} */
     this.targets = parsedTargets;
+    /** @type {String|Number} */
+    this.id = !helpers.isUnd(id) ? id : JSAnimationId;
     /** @type {Number} */
     this.duration = iterationDuration === consts.minValue ? consts.minValue : helpers.clampInfinity(((iterationDuration + this._loopDelay) * this.iterationCount) - this._loopDelay) || consts.minValue;
     /** @type {Callback<this>} */
     this.onRender = onRender || animDefaults.onRender;
     /** @type {EasingFunction} */
-    this._ease = animEase;
+    this._ease = parsedAnimPlaybackEase;
     /** @type {Number} */
     this._delay = iterationDelay;
     // NOTE: I'm keeping delay values separated from offsets in timelines because delays can override previous tweens and it could be confusing to debug a timeline with overridden tweens and no associated visible delays.
