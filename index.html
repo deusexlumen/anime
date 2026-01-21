@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Royal Flux</title>
+    <title>DEMOKRATIE 2.0 | Der Abstieg</title>
     <style>
         :root {
             --void: #050505;
@@ -11,7 +11,7 @@
             --gold-dim: rgba(212, 175, 55, 0.1);
             --platinum: #e5e4e2;
             --glass: rgba(15, 15, 15, 0.95);
-            --rust: #8a3324; /* Farbe für die Krise */
+            --rust: #8a3324;
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -22,19 +22,18 @@
             color: var(--platinum);
             font-family: var(--font-main);
             overflow-x: hidden;
-            height: 18000px; /* Mehr Raum für Eleganz */
+            height: 18000px;
             overscroll-behavior: none;
             cursor: default;
         }
 
-        /* --- LAYER 0: CANVAS (ATMOSPHERE) --- */
+        /* --- LAYER 0: CANVAS --- */
         #sovereign-field {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 0; pointer-events: none;
-            transition: filter 2s ease; /* Weicher Übergang für Akt 3 */
         }
 
-        /* --- LAYER 0.5: CINEMATIC VIGNETTE --- */
+        /* --- LAYER 0.5: VIGNETTE --- */
         #vignette {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, transparent 30%, #000000 140%);
@@ -44,7 +43,7 @@
         /* --- LAYER 1: TUNNEL --- */
         #tunnel-viewport {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 1200px; /* Sehr tiefe, edle Perspektive */
+            perspective: 1200px;
             z-index: 2;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
@@ -72,102 +71,99 @@
             body { height: auto; overflow-y: auto; }
         }
 
-        /* --- TYPOGRAPHY (PREMIUM) --- */
+        /* --- TYPOGRAPHY --- */
         h1 {
             font-size: clamp(3rem, 6vw, 7rem);
-            font-weight: 300; /* Dünner = Edler */
-            text-transform: uppercase;
-            letter-spacing: 0.3em; /* Weites Tracking */
-            color: var(--gold);
-            margin-bottom: 2rem;
+            font-weight: 300; text-transform: uppercase; letter-spacing: 0.3em;
+            color: var(--gold); margin-bottom: 2rem;
             text-shadow: 0 0 40px var(--gold-dim);
         }
 
         h2 {
-            font-size: 2rem;
-            color: var(--platinum);
-            font-weight: 300;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-bottom: 3rem;
-            position: relative;
-            display: inline-block;
+            font-size: 2rem; color: var(--platinum); font-weight: 300; letter-spacing: 0.15em;
+            text-transform: uppercase; margin-bottom: 3rem; position: relative; display: inline-block;
         }
         
         h2::after {
             content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 1px; background: var(--gold);
-            transition: width 0.5s ease;
+            width: 40px; height: 1px; background: var(--gold); transition: width 0.5s ease;
         }
-        .node.active h2::after { width: 120px; } /* Animation bei Fokus */
+        .node.active h2::after { width: 120px; }
 
         .char { display: inline-block; opacity: 0; transform: translateY(20px); }
 
-        /* --- MEDIA SLOT (GLASS & GOLD) --- */
+        /* --- MEDIA SLOT (INTERACTIVE) --- */
         .media-slot {
-            padding: 4rem;
+            padding: 3rem;
             background: var(--glass);
             border: 1px solid rgba(212, 175, 55, 0.15);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); /* Elegant easing */
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Feiner Glow-Rahmen */
-        .media-slot::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            opacity: 0.5;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; overflow: hidden; cursor: pointer;
         }
 
         .media-slot:hover {
-            border-color: rgba(212, 175, 55, 0.4);
-            transform: translateY(-5px); /* Sanftes Schweben */
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.8);
+            border-color: rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
+        }
+
+        .media-slot.playing {
+            border-color: var(--gold);
+            background: rgba(20, 20, 20, 0.98);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
         }
 
         p {
-            font-size: 1.1rem; line-height: 1.8; color: var(--platinum);
-            opacity: 0.8; max-width: 600px; margin: 0 auto;
-            font-weight: 300; letter-spacing: 0.05em;
+            font-size: 1.1rem; line-height: 1.8; color: var(--platinum); opacity: 0.9;
+            max-width: 600px; margin: 0 auto; font-weight: 300; letter-spacing: 0.05em;
+            pointer-events: none;
         }
 
         .label {
             font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em;
             color: var(--gold); margin-bottom: 1.5rem; display: block;
+            pointer-events: none;
         }
+
+        /* --- EQUALIZER --- */
+        .equalizer {
+            display: flex; gap: 4px; justify-content: center; height: 30px; margin-bottom: 20px;
+            align-items: flex-end; opacity: 0.3; transition: opacity 0.3s;
+        }
+        .playing .equalizer { opacity: 1; }
+        
+        .bar { width: 3px; background: var(--gold); height: 5px; transition: height 0.2s ease; }
+        
+        .playing .bar { animation: eq 0.5s infinite ease-in-out alternate; }
+        .playing .bar:nth-child(1) { animation-delay: 0.1s; }
+        .playing .bar:nth-child(2) { animation-delay: 0.3s; }
+        .playing .bar:nth-child(3) { animation-delay: 0.0s; }
+        .playing .bar:nth-child(4) { animation-delay: 0.4s; }
+        .playing .bar:nth-child(5) { animation-delay: 0.2s; }
+
+        @keyframes eq { 0% { height: 5px; } 100% { height: 25px; } }
 
         /* --- UI ELEMENTS --- */
         .btn {
-            padding: 1.2rem 3rem;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            text-decoration: none;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.25em;
-            transition: all 0.5s ease;
-            background: transparent;
+            padding: 1.2rem 3rem; border: 1px solid var(--gold); color: var(--gold);
+            text-decoration: none; text-transform: uppercase; font-size: 0.8rem;
+            letter-spacing: 0.25em; transition: all 0.5s ease; background: transparent;
         }
-        .btn:hover { background: var(--gold); color: var(--void); box-shadow: 0 0 30px var(--gold-dim); }
+        .btn:hover { background: var(--gold); color: var(--void); }
 
-        /* --- LOADING SCREEN --- */
         #loader {
             position: fixed; inset: 0; background: var(--void); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            transition: opacity 1.5s ease;
+            transition: opacity 1s ease;
         }
-        .loader-logo {
-            width: 50px; height: 50px; border: 1px solid var(--gold);
-            animation: spin 4s infinite linear;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .loader-text { color: var(--gold); letter-spacing: 0.5em; animation: blink 2s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
 
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="loader-logo"></div></div>
+    <div id="loader"><div class="loader-text">Φ | INITIALIZING...</div></div>
 
     <canvas id="sovereign-field"></canvas>
     <div id="vignette"></div>
@@ -177,42 +173,63 @@
             
             <section class="node" id="prolog" data-z="0" data-act="prolog">
                 <h1 class="stagger-text">Stasis</h1>
-                <p>Der politische Stillstand.<br>Willkommen im Ende der Geschichte.</p>
+                <p>Willkommen im Ende der Geschichte.<br>Der Stillstand ist politisch gewollt.</p>
                 <div style="margin-top: 8rem; opacity: 0.4; font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold);">
                     SCROLL TO DESCEND
                 </div>
             </section>
 
             <section class="node" id="act-1" data-z="4000" data-act="order">
-                <h2 class="stagger-text">Der Ursprung</h2>
-                <div class="media-slot">
-                    <span class="label">Audio-Log 01</span>
-                    <p><i>"Wahlen sind oligarchisch.<br>Das Los ist demokratisch."</i></p>
-                    <div style="margin-top: 2rem; height: 1px; width: 50px; background: var(--gold); margin-left: auto; margin-right: auto;"></div>
+                <h2 class="stagger-text">Die Illusion</h2>
+                <audio id="audio-1" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" preload="auto"></audio>
+                
+                <div class="media-slot" onclick="toggleAudio('audio-1', this)">
+                    <div class="equalizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <span class="label">▶ Play Audio-Log 01</span>
+                    <p>Warum Politiker eigentlich keine Politik machen.</p>
                 </div>
             </section>
 
             <section class="node" id="act-2" data-z="8000" data-act="focus">
-                <h2 class="stagger-text">Die Logik</h2>
-                <div class="media-slot">
-                    <span class="label">Audio-Log 02</span>
-                    <p>Kompetenz entsteht nicht durch Karriere.<br>Sie entsteht durch kognitive Diversität.</p>
+                <h2 class="stagger-text">Die Oligarchie</h2>
+                <audio id="audio-2" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" preload="auto"></audio>
+
+                <div class="media-slot" onclick="toggleAudio('audio-2', this)">
+                    <div class="equalizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <span class="label">▶ Play Audio-Log 02</span>
+                    <p>Wie Bildung einen neuen Adel schafft.</p>
                 </div>
             </section>
 
             <section class="node" id="act-3" data-z="12000" data-act="chaos">
-                <h2 class="stagger-text" style="color: #bf4040;">Die Krise</h2> <div class="media-slot" style="border-color: rgba(191, 64, 64, 0.3);">
-                    <span class="label" style="color: #bf4040;">System Warning</span>
-                    <p>Warum wir unsere Demokratie retten müssen,<br>indem wir sie neu erfinden.</p>
+                <h2 class="stagger-text" style="color: #bf4040;">Der Brand</h2>
+                <audio id="audio-3" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" preload="auto"></audio>
+
+                <div class="media-slot" onclick="toggleAudio('audio-3', this)" style="border-color: rgba(191, 64, 64, 0.3);">
+                    <div class="equalizer">
+                        <div class="bar" style="background: #bf4040;"></div><div class="bar" style="background: #bf4040;"></div>
+                        <div class="bar" style="background: #bf4040;"></div><div class="bar" style="background: #bf4040;"></div>
+                    </div>
+                    <span class="label" style="color: #bf4040;">▶ Play System Warning</span>
+                    <p>Parteien als historischer Brandbeschleuniger für Diktaturen.</p>
                 </div>
             </section>
 
             <section class="node" id="act-4" data-z="16000" data-act="glory">
-                <h1 class="stagger-text">Vision</h1>
-                <div class="media-slot" style="border: 1px solid var(--gold); box-shadow: 0 0 60px rgba(212,175,55,0.1);">
-                    <span class="label">Video-Manifest</span>
-                    <div style="font-size: 3rem; margin: 1rem 0; color: var(--gold);">▶</div>
-                    <p>Die Kinetische Isonomie.<br>Das Ende der Politiker.</p>
+                <h1 class="stagger-text">Die Lösung</h1>
+                <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" preload="auto"></audio>
+
+                <div class="media-slot" onclick="toggleAudio('audio-4', this)" style="border: 1px solid var(--gold); box-shadow: 0 0 50px rgba(212,175,55,0.1);">
+                    <div class="equalizer">
+                        <div class="bar" style="background: #fff;"></div><div class="bar" style="background: #fff;"></div>
+                        <div class="bar" style="background: #fff;"></div><div class="bar" style="background: #fff;"></div>
+                    </div>
+                    <span class="label" style="color: #fff;">▶ Play Manifesto</span>
+                    <p style="color: #fff;">Losdemokratie als einziger Schutz vor Faschismus.</p>
                 </div>
             </section>
 
@@ -232,34 +249,58 @@
 
         // --- CONFIG ---
         const CONFIG = {
-            colors: { 
-                gold: '#d4af37', 
-                white: '#e5e4e2', 
-                rust: '#8a3324' // Farbe für Akt 3
-            },
-            particleCount: 100, // Weniger ist mehr (Eleganz)
+            colors: { gold: '#d4af37', white: '#e5e4e2', rust: '#8a3324' },
+            particleCount: 100,
             renderDistance: 3500,
-            scrollLerp: 0.06 // SEHR NIEDRIG für "schweres" Gefühl
+            scrollLerp: 0.06
         };
 
         const STATE = {
             currentScroll: 0,
             targetScroll: 0,
-            activeAct: 'prolog'
+            activeAct: 'prolog',
+            currentlyPlaying: null
         };
 
-        // --- DOM REFS ---
+        // --- DOM ---
         const world = document.getElementById('tunnel-world');
         const canvas = document.getElementById('sovereign-field');
-        const ctx = canvas.getContext('2d', { alpha: false }); // Performance
+        const ctx = canvas.getContext('2d', { alpha: false });
         let w, h;
 
-        // --- TEXT SPLITTING & SETUP ---
+        // --- AUDIO ENGINE ---
+        window.toggleAudio = function(id, element) {
+            const audio = document.getElementById(id);
+            const label = element.querySelector('.label');
+            const originalText = label.innerText.replace('⏸ Pause', '▶ Play').replace('▶ Play', '▶ Play');
+
+            // Toggle Logic
+            if (!audio.paused) {
+                audio.pause();
+                element.classList.remove('playing');
+                label.innerText = originalText;
+                STATE.currentlyPlaying = null;
+            } else {
+                // Stop others
+                document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+                document.querySelectorAll('.media-slot').forEach(el => {
+                    el.classList.remove('playing');
+                    const l = el.querySelector('.label');
+                    if(l) l.innerText = l.innerText.replace('⏸ Pause', '▶ Play');
+                });
+
+                // Play this
+                audio.play();
+                element.classList.add('playing');
+                label.innerText = originalText.replace('▶ Play', '⏸ Pause');
+                STATE.currentlyPlaying = id;
+            }
+        };
+
+        // --- SETUP ---
         const nodes = Array.from(document.querySelectorAll('.node')).map(el => {
-            // Text splitten für elegante Animation
             const headlines = el.querySelectorAll('.stagger-text');
             let animatables = [];
-            
             headlines.forEach(hl => {
                 const text = hl.textContent;
                 hl.innerHTML = '';
@@ -271,7 +312,6 @@
                     animatables.push(span);
                 });
             });
-
             return {
                 el,
                 z: parseInt(el.getAttribute('data-z')),
@@ -287,129 +327,97 @@
             const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
             window.addEventListener('resize', resize);
             resize();
-
-            // Placement
-            nodes.forEach(node => {
-                node.el.style.transform = `translate3d(-50%, -50%, ${node.z}px)`;
-            });
-
-            // Smooth Loader Fade
-            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 1000);
-            setTimeout(() => { document.getElementById('loader').remove(); }, 2500);
+            nodes.forEach(node => { node.el.style.transform = `translate3d(-50%, -50%, ${node.z}px)`; });
+            setTimeout(() => { document.getElementById('loader').style.opacity = 0; }, 500);
+            setTimeout(() => { document.getElementById('loader').remove(); }, 1500);
         }
         init();
 
-        // --- ELEGANT PARTICLES (EMBER/DUST) ---
+        // --- PARTICLES ---
         class Particle {
             constructor() { this.reset(); }
             reset() {
-                this.x = Math.random() * w;
-                this.y = Math.random() * h;
-                this.size = Math.random() * 1.5 + 0.5; // Sehr klein, wie Staub
-                this.speed = Math.random() * 0.2 + 0.05; // Sehr langsam
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speed = Math.random() * 0.2 + 0.05;
                 this.alpha = Math.random() * 0.5 + 0.1;
                 this.wobble = Math.random() * Math.PI * 2;
             }
             update(act) {
-                // Generelle langsame Aufwärtsbewegung (Funken/Hoffnung)
                 this.y -= this.speed;
                 this.x += Math.sin(this.wobble) * 0.1;
                 this.wobble += 0.01;
-
-                // Color Logic
-                if (act === 'chaos') {
-                    // In der Krise werden sie leicht unruhig und rot
-                    this.x += (Math.random() - 0.5) * 1;
-                } 
-
+                if(act === 'chaos') this.x += (Math.random() - 0.5) * 1;
                 if(this.y < 0) this.y = h;
             }
             draw(color) {
-                ctx.fillStyle = color; // Wird vom Loop übergeben
-                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = color; ctx.globalAlpha = this.alpha;
                 ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
         const particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
 
-
-        // --- RENDER LOOP ---
+        // --- LOOP ---
         function render() {
             STATE.targetScroll = window.scrollY;
-            
-            // HEAVY LERP: Das Geheimnis der Eleganz
-            // Je kleiner der Faktor (0.06), desto schwerer und edler wirkt das Scrollen.
             STATE.currentScroll += (STATE.targetScroll - STATE.currentScroll) * CONFIG.scrollLerp;
 
-            // 1. World Move
             world.style.transform = `translate3d(0, 0, ${-STATE.currentScroll.toFixed(2)}px)`;
 
-            // 2. Atmosphere Check (Akt 3 Färbung)
-            let closestAct = 'prolog';
             let closestDist = Infinity;
-
+            
             nodes.forEach(node => {
                 const dist = Math.abs(node.z - STATE.currentScroll);
-                
-                // Active Act Detection
-                if(dist < closestDist) { closestDist = dist; closestAct = node.act; }
+                if(dist < closestDist) { closestDist = dist; STATE.activeAct = node.act; }
+
+                // SMART FADE: Audio leiser machen, wenn man wegscrollt
+                if (STATE.currentlyPlaying) {
+                    const audioEl = document.getElementById(STATE.currentlyPlaying);
+                    const parentNode = audioEl.closest('.node');
+                    const parentZ = parseInt(parentNode.getAttribute('data-z'));
+                    const audioDist = Math.abs(parentZ - STATE.currentScroll);
+                    
+                    if (audioDist > 1200 && !audioEl.paused) {
+                        if(audioEl.volume > 0.02) audioEl.volume -= 0.02;
+                        else {
+                            audioEl.pause();
+                            audioEl.volume = 1;
+                            const slot = parentNode.querySelector('.media-slot');
+                            slot.classList.remove('playing');
+                            slot.querySelector('.label').innerText = slot.querySelector('.label').innerText.replace('⏸ Pause', '▶ Play');
+                            STATE.currentlyPlaying = null;
+                        }
+                    }
+                }
 
                 if (dist < CONFIG.renderDistance) {
-                    if (!node.visible) {
-                        node.el.style.visibility = 'visible';
-                        node.visible = true;
-                    }
+                    if (!node.visible) { node.el.style.visibility = 'visible'; node.visible = true; }
                     
-                    // Soft Opacity
-                    const opacity = Math.max(0, 1 - (dist / 2000)); // Weicher Fade
+                    const opacity = Math.max(0, 1 - (dist / 2000));
                     node.el.style.opacity = opacity.toFixed(2);
 
-                    // ELEGANT REVEAL ANIMATION (Stagger)
                     if (opacity > 0.5 && !node.animated) {
                         node.animated = true;
-                        node.el.classList.add('active'); // Trigger CSS lines
+                        node.el.classList.add('active');
                         if(node.animatables.length > 0) {
                             animate(node.animatables, {
-                                translateY: [30, 0],
-                                opacity: [0, 1],
-                                delay: stagger(40), // Langsames, edles Einblenden
-                                duration: 1200,
-                                easing: 'easeOutExpo'
+                                translateY: [30, 0], opacity: [0, 1],
+                                delay: stagger(40), duration: 1200, easing: 'easeOutExpo'
                             });
                         }
                     }
                 } else {
-                    if (node.visible) {
-                        node.el.style.visibility = 'hidden';
-                        node.visible = false;
-                        node.animated = false;
-                    }
+                    if (node.visible) { node.el.style.visibility = 'hidden'; node.visible = false; node.animated = false; }
                 }
             });
-            STATE.activeAct = closestAct;
 
-            // 3. Canvas Render
-            // Background Color Change Transition
-            let bgColor = '#050505'; // Default Void
+            // Canvas Colors
             let pColor = CONFIG.colors.gold;
+            if (STATE.activeAct === 'chaos') pColor = CONFIG.colors.rust;
+            else if (STATE.activeAct === 'glory') pColor = CONFIG.colors.white;
 
-            if (STATE.activeAct === 'chaos') {
-                // Subtile Rötung im Hintergrund bei der Krise
-                // Wir nutzen hier keine direkte Canvas-Manipulation für BG, sondern lassen es schwarz
-                // und ändern die Partikelfarbe drastisch.
-                pColor = CONFIG.colors.rust;
-            } else if (STATE.activeAct === 'glory') {
-                pColor = CONFIG.colors.white;
-            }
-
-            ctx.fillStyle = bgColor;
-            ctx.globalAlpha = 1;
-            ctx.fillRect(0, 0, w, h); // Clear Canvas
-
-            particles.forEach(p => {
-                p.update(STATE.activeAct);
-                p.draw(pColor);
-            });
+            ctx.fillStyle = '#050505'; ctx.globalAlpha = 1; ctx.fillRect(0, 0, w, h);
+            particles.forEach(p => { p.update(STATE.activeAct); p.draw(pColor); });
 
             requestAnimationFrame(render);
         }
