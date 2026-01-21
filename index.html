@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Die Wahrheit</title>
+    <title>DEMOKRATIE 2.0 | System Reboot</title>
     <style>
         :root {
             --void: #000000;
             --gold: #d4af37;
-            --gold-light: #fadd80;
-            --toxin: #8a2be2; /* Lila für den Bildungsadel */
-            --blood: #8a0a0a; /* Dunkelrot für den Parteien-Krieg */
-            --tech: #00f0ff; /* Cyan für technische Validierung */
+            --toxin: #8a2be2;
+            --blood: #8a0a0a;
+            --tech: #00f0ff;
             --glass: rgba(10, 10, 10, 0.90);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
@@ -23,133 +22,64 @@
             color: #fff;
             font-family: var(--font-main);
             overflow-x: hidden;
-            height: 24000px; /* Massive Tiefe für Subliminals */
+            height: 24000px;
             overscroll-behavior: none;
             cursor: crosshair;
         }
 
-        /* --- LAYER 0: REACTIVE CANVAS --- */
-        #sovereign-field {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0; pointer-events: none;
-            transition: filter 1s ease;
+        /* --- DEBUG CONSOLE (Wenn Fehler auftreten) --- */
+        #debug-console {
+            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 200px;
+            background: rgba(50,0,0,0.9); color: #ff5555; font-family: monospace;
+            padding: 10px; z-index: 99999; overflow-y: auto; display: none;
+            border-top: 2px solid red; font-size: 12px;
         }
 
-        /* --- LAYER 0.5: NOISE & GLITCH OVERLAY --- */
-        #noise {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');
-            z-index: 1; pointer-events: none; opacity: 0.3;
-            mix-blend-mode: overlay;
-        }
-
-        /* --- LAYER 1: 3D TUNNEL --- */
+        /* --- VISUALS --- */
+        #sovereign-field { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        
         #tunnel-viewport {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 800px;
-            z-index: 2;
-            overflow: hidden;
+            perspective: 800px; z-index: 2; overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
 
         #tunnel-world {
             position: absolute; width: 100%; height: 100%;
-            transform-style: preserve-3d;
-            will-change: transform;
+            transform-style: preserve-3d; will-change: transform;
         }
 
-        /* --- MAIN NODES (AUDIO STATIONS) --- */
         .node {
             position: absolute; top: 50%; left: 50%;
-            width: 80vw; max-width: 900px;
-            text-align: center;
-            opacity: 0;
+            width: 80vw; max-width: 900px; text-align: center; opacity: 0;
             transform: translate3d(-50%, -50%, 0);
             backface-visibility: hidden;
         }
 
-        /* --- FLASH TEXT (SUBLIMINALS) --- */
+        /* --- FLASH TEXT --- */
         .flash-text {
             position: absolute; top: 50%; left: 50%;
             font-size: 4rem; font-weight: 900; text-transform: uppercase;
-            color: rgba(255,255,255,0.15);
-            white-space: nowrap;
-            pointer-events: none;
-            letter-spacing: 0.5rem;
-            transform-style: preserve-3d;
-            text-shadow: 0 0 20px rgba(0,0,0,1);
+            color: rgba(255,255,255,0.1); white-space: nowrap; pointer-events: none;
+            letter-spacing: 0.5rem; transform-style: preserve-3d;
         }
 
-        /* --- UI DESIGN --- */
-        h1 {
-            font-size: clamp(4rem, 8vw, 10rem); font-weight: 800;
-            text-transform: uppercase; letter-spacing: 0.1em;
-            color: var(--gold); line-height: 0.9; margin-bottom: 2rem;
-            text-shadow: 0 0 50px rgba(212,175,55,0.3);
-        }
+        /* --- UI --- */
+        h1 { font-size: clamp(4rem, 8vw, 10rem); color: var(--gold); margin-bottom: 2rem; text-shadow: 0 0 50px rgba(212,175,55,0.3); }
+        h2 { font-size: 1.5rem; color: #888; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 3rem; border-bottom: 1px solid #444; display: inline-block; }
 
-        h2 {
-            font-size: 1.5rem; color: #888; letter-spacing: 0.3em;
-            text-transform: uppercase; margin-bottom: 3rem; border-bottom: 1px solid #444;
-            display: inline-block; padding-bottom: 10px;
-        }
-
-        /* --- MONOLITH PLAYER --- */
         .monolith {
-            padding: 4rem;
-            background: rgba(5, 5, 5, 0.9);
-            border: 1px solid #333;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,1);
-            position: relative; overflow: hidden; cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 4rem; background: rgba(5, 5, 5, 0.9); border: 1px solid #333;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,1); position: relative;
+            transition: all 0.4s ease; cursor: pointer;
         }
-        
-        .monolith::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px;
-            background: #333; transition: width 0.5s ease;
-        }
+        .monolith:hover { border-color: #fff; transform: scale(1.05) translateZ(50px); }
+        .monolith.playing { border-color: var(--gold); box-shadow: 0 0 80px rgba(212,175,55,0.2); }
 
-        .monolith:hover {
-            border-color: #fff;
-            transform: scale(1.05) translateZ(50px);
-        }
+        .quote-main { font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+        .quote-sub { font-size: 1rem; color: #888; font-weight: 300; }
 
-        .monolith.playing {
-            border-color: var(--gold);
-            box-shadow: 0 0 80px rgba(212,175,55,0.15);
-        }
-        .monolith.playing::after { background: var(--gold); box-shadow: 0 0 20px var(--gold); }
-
-        /* Crisis Mode Style */
-        .node[data-act="danger"] .monolith.playing { border-color: var(--blood); }
-        .node[data-act="danger"] .monolith.playing::after { background: var(--blood); box-shadow: 0 0 20px var(--blood); }
-
-        /* Truth Mode Style */
-        .node[data-act="solution"] .monolith.playing { border-color: #fff; }
-        .node[data-act="solution"] .monolith.playing::after { background: #fff; box-shadow: 0 0 20px #fff; }
-
-
-        .quote-main {
-            font-size: 1.4rem; line-height: 1.5; font-weight: 600; color: #fff;
-            margin-bottom: 1rem;
-        }
-        .quote-sub {
-            font-size: 1rem; color: #888; font-weight: 300;
-        }
-
-        /* --- ENDCARD: THE HOLOGRAPHIC TABLE --- */
-        #hologram-table {
-            border: 1px solid var(--tech);
-            background: rgba(0, 240, 255, 0.05);
-            padding: 3rem;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
-            box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
-            backdrop-filter: blur(5px);
-        }
-        .holo-item h3 { color: var(--tech); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
-        .holo-item p { font-size: 0.9rem; color: #aaa; }
-
-        /* --- START OVERLAY --- */
+        /* --- START SCREEN --- */
         #start-overlay {
             position: fixed; inset: 0; background: #000; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -162,19 +92,29 @@
         }
         .start-btn:hover { background: #fff; color: #000; }
 
-        /* UTILS */
-        .hidden { opacity: 0; pointer-events: none; }
+        /* --- ENDCARD --- */
+        #hologram-table {
+            border: 1px solid var(--tech); background: rgba(0, 240, 255, 0.05);
+            padding: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            backdrop-filter: blur(5px);
+        }
+        .holo-item h3 { color: var(--tech); text-transform: uppercase; letter-spacing: 0.1em; }
+        .holo-item p { font-size: 0.9rem; color: #aaa; }
+
     </style>
+    
+    <script src="./dist/bundles/anime.umd.js"></script>
 </head>
 <body>
 
+    <div id="debug-console">SYSTEM STATUS: INITIALIZING...<br></div>
+
     <div id="start-overlay" onclick="startSystem()">
-        <div class="start-btn">ENTER SYSTEM</div>
-        <div style="margin-top: 20px; font-family: monospace; color: #444;">AUDIO REQUIRED</div>
+        <div class="start-btn">INITIALIZE V10.1</div>
+        <div style="margin-top: 20px; font-family: monospace; color: #444;">CLICK TO ACTIVATE</div>
     </div>
 
     <canvas id="sovereign-field"></canvas>
-    <div id="noise"></div>
 
     <div id="tunnel-viewport">
         <div id="tunnel-world">
@@ -183,86 +123,90 @@
 
             <section class="node" data-z="0" data-act="prolog">
                 <h1>Stasis</h1>
-                <p class="quote-main" style="font-weight: 300; opacity: 0.7;">Wir leben in einer fortwährenden Aristokratie.</p>
+                <p class="quote-main" style="opacity: 0.7;">Das Trugbild der Moderne.</p>
                 <div style="margin-top: 10rem; font-size: 0.8rem; letter-spacing: 0.3em; opacity: 0.5;">SCROLL TO DESCEND</div>
             </section>
 
             <section class="node" data-z="4000" data-act="illusion">
                 <h2>Phase I: Die Täuschung</h2>
-                <audio id="audio-1" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" crossorigin="anonymous"></audio>
+                <audio id="audio-1" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" preload="auto"></audio>
                 <div class="monolith" onclick="toggleAudio('audio-1', this)">
                     <div class="quote-main">"Bildungsideale sind die Geißel der Menschheit."</div>
-                    <div class="quote-sub">Wie wir einen neuen Adel schufen, statt Menschen zu befreien.</div>
-                    <div style="margin-top: 2rem; color: var(--toxin); font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY FILE 01</div>
+                    <div class="quote-sub">Wie wir einen neuen Adel schufen.</div>
+                    <div style="margin-top: 2rem; color: var(--toxin); font-size: 0.7rem;">▶ ACCESS FILE 01</div>
                 </div>
             </section>
 
             <section class="node" data-z="8000" data-act="danger">
                 <h2 style="color: var(--blood); border-color: var(--blood);">Phase II: Der Brand</h2>
-                <audio id="audio-2" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" crossorigin="anonymous"></audio>
+                <audio id="audio-2" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" preload="auto"></audio>
                 <div class="monolith" onclick="toggleAudio('audio-2', this)">
-                    <div class="quote-main" style="color: var(--blood);">"Parteien sind Brandbeschleuniger für Diktaturen."</div>
-                    <div class="quote-sub">Der Kampf um die Macht gebiert Tyrannei. Wahlen verhindern das nicht.</div>
-                    <div style="margin-top: 2rem; color: var(--blood); font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY WARNING</div>
+                    <div class="quote-main" style="color: var(--blood);">"Parteien sind Brandbeschleuniger."</div>
+                    <div class="quote-sub">Der Kampf um die Macht gebiert Tyrannei.</div>
+                    <div style="margin-top: 2rem; color: var(--blood); font-size: 0.7rem;">▶ WARNING PROTOCOL</div>
                 </div>
             </section>
 
             <section class="node" data-z="12000" data-act="void">
                 <h2>Phase III: Der Unbegriff</h2>
-                <audio id="audio-3" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" crossorigin="anonymous"></audio>
+                <audio id="audio-3" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" preload="auto"></audio>
                 <div class="monolith" onclick="toggleAudio('audio-3', this)">
                     <div class="quote-main">"Politiker machen keine Politik."</div>
-                    <div class="quote-sub">Wir haben eine unpolitische Gesellschaft erschaffen, verwaltet von Dienstleistern.</div>
-                    <div style="margin-top: 2rem; font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY FILE 03</div>
+                    <div class="quote-sub">Wir haben eine unpolitische Gesellschaft erschaffen.</div>
+                    <div style="margin-top: 2rem; font-size: 0.7rem;">▶ ACCESS FILE 03</div>
                 </div>
             </section>
 
             <section class="node" data-z="16000" data-act="solution">
-                <h1 style="font-size: 6rem; text-shadow: 0 0 80px rgba(255,255,255,0.8);">Souveränität</h1>
-                <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" crossorigin="anonymous"></audio>
+                <h1 style="font-size: 6rem;">Souveränität</h1>
+                <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" preload="auto"></audio>
                 <div class="monolith" onclick="toggleAudio('audio-4', this)" style="background: rgba(255,255,255,0.1); border-color: #fff;">
                     <div class="quote-main" style="color: #fff;">"Der einzige Schutz vor Faschismus."</div>
-                    <div class="quote-sub">Wenn alle herrschen, herrscht niemand über uns. Das ist Isonomie.</div>
-                    <div style="margin-top: 2rem; color: #fff; font-size: 0.7rem; letter-spacing: 0.2em;">▶ PLAY MANIFESTO</div>
+                    <div class="quote-sub">Isonomie: Wenn alle herrschen, herrscht niemand.</div>
+                    <div style="margin-top: 2rem; color: #fff; font-size: 0.7rem;">▶ FINAL MANIFESTO</div>
                 </div>
             </section>
 
             <section class="node" data-z="20000" data-act="matrix">
                 <h2 style="color: var(--tech); border-color: var(--tech);">System Validierung</h2>
                 <div id="hologram-table">
-                    <div class="holo-item">
-                        <h3>X-Road</h3>
-                        <p>Dezentraler Datenaustausch (Estland Modell).<br>Keine zentrale Schwachstelle.</p>
-                    </div>
-                    <div class="holo-item">
-                        <h3>KSI Blockchain</h3>
-                        <p>Unbestechliche Integrität aller Los-Verfahren.<br>Mathematisch verifiziert.</p>
-                    </div>
-                    <div class="holo-item">
-                        <h3>eIDAS</h3>
-                        <p>EU-konforme digitale Identität.<br>Souveräner Bürger-Login.</p>
-                    </div>
-                    <div class="holo-item">
-                        <h3>Drand Beacon</h3>
-                        <p>Öffentlich prüfbarer Zufall.<br>Manipulation unmöglich.</p>
-                    </div>
+                    <div class="holo-item"><h3>X-Road</h3><p>Dezentraler Datenaustausch.</p></div>
+                    <div class="holo-item"><h3>KSI Blockchain</h3><p>Unbestechliche Integrität.</p></div>
+                    <div class="holo-item"><h3>eIDAS</h3><p>Digitale Identität.</p></div>
+                    <div class="holo-item"><h3>Drand Beacon</h3><p>Verifizierbarer Zufall.</p></div>
                 </div>
-                <div style="margin-top: 4rem; display: flex; justify-content: center; gap: 2rem;">
+                <div style="margin-top: 4rem;">
                     <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="start-btn" style="font-size: 0.8rem; padding: 1.5rem 3rem; text-decoration: none; border-color: var(--tech); color: var(--tech);">MATRIX PDF</a>
-                    <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="start-btn" style="font-size: 0.8rem; padding: 1.5rem 3rem; text-decoration: none;">YOUTUBE</a>
                 </div>
             </section>
 
         </div>
     </div>
 
-    <script type="module">
-        import { animate, utils } from './dist/bundles/anime.esm.js';
+    <script>
+        // --- ERROR HANDLING SYSTEM ---
+        function logError(msg) {
+            const consoleEl = document.getElementById('debug-console');
+            consoleEl.style.display = 'block';
+            consoleEl.innerHTML += `ERROR: ${msg}<br>`;
+            console.error(msg);
+        }
+        
+        window.onerror = function(message, source, lineno, colno, error) {
+            logError(`${message} at line ${lineno}`);
+        };
 
-        // --- CONFIGURATION ---
+        // --- CHECK IF ANIME LOADED ---
+        if (typeof anime === 'undefined') {
+            logError("CRITICAL: anime.umd.js not found! Check the 'dist/bundles' folder path.");
+        } else {
+            console.log("System: Anime.js Engine Loaded.");
+        }
+
+        // --- CONFIG & STATE ---
         const CONFIG = {
-            scrollLerp: 0.05, // Heavy Cinematic Feel
-            particleCount: 180,
+            scrollLerp: 0.08, 
+            particleCount: 150,
             flashTexts: [
                 { text: "NEUER ADEL", z: 2000, x: -400, y: -200 },
                 { text: "GEISSEL DER MENSCHHEIT", z: 3000, x: 300, y: 100 },
@@ -278,16 +222,11 @@
         };
 
         const STATE = {
-            scroll: 0,
-            targetScroll: 0,
-            act: 'prolog',
-            audioCtx: null,
-            analyser: null,
-            dataArray: null,
-            bass: 0
+            scroll: 0, targetScroll: 0, act: 'prolog',
+            audioCtx: null, analyser: null, dataArray: null, bass: 0
         };
 
-        // --- DOM REFS ---
+        // --- DOM ---
         const world = document.getElementById('tunnel-world');
         const canvas = document.getElementById('sovereign-field');
         const ctx = canvas.getContext('2d', { alpha: false });
@@ -300,40 +239,46 @@
                 const el = document.createElement('div');
                 el.className = 'flash-text';
                 el.textContent = item.text;
-                // Initial placement
+                // Statische Positionierung im 3D Raum
+                // Wir nutzen CSS transform direkt
+                el.style.transform = `translate3d(-50%, -50%, 0) translate3d(${item.x}px, ${item.y}px, ${item.z}px)`;
                 el.setAttribute('data-z', item.z);
-                el.setAttribute('data-x', item.x);
-                el.setAttribute('data-y', item.y);
-                // Style variations based on Act
-                if(item.z > 6000 && item.z < 9000) el.style.color = 'rgba(138, 10, 10, 0.2)'; // Blood for crisis
+                
+                if(item.z > 6000 && item.z < 9000) el.style.color = 'rgba(138, 10, 10, 0.2)';
                 container.appendChild(el);
             });
         }
 
         // --- SYSTEM START ---
         window.startSystem = function() {
-            STATE.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            STATE.analyser = STATE.audioCtx.createAnalyser();
-            STATE.analyser.fftSize = 256;
-            STATE.dataArray = new Uint8Array(STATE.analyser.frequencyBinCount);
+            try {
+                STATE.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                STATE.analyser = STATE.audioCtx.createAnalyser();
+                STATE.analyser.fftSize = 256;
+                STATE.dataArray = new Uint8Array(STATE.analyser.frequencyBinCount);
 
-            // Audio Nodes Connect
-            document.querySelectorAll('audio').forEach(el => {
-                const src = STATE.audioCtx.createMediaElementSource(el);
-                src.connect(STATE.analyser);
-                STATE.analyser.connect(STATE.audioCtx.destination);
-            });
+                document.querySelectorAll('audio').forEach(el => {
+                    // Check if file exists roughly by trying to load metadata
+                    el.addEventListener('error', (e) => logError(`Audio not found: ${el.src}`));
+                    
+                    const src = STATE.audioCtx.createMediaElementSource(el);
+                    src.connect(STATE.analyser);
+                    STATE.analyser.connect(STATE.audioCtx.destination);
+                });
 
-            // UI Fade
-            const ol = document.getElementById('start-overlay');
-            ol.style.opacity = 0;
-            setTimeout(() => ol.remove(), 1000);
-            
-            loop();
+                document.getElementById('start-overlay').style.opacity = 0;
+                setTimeout(() => document.getElementById('start-overlay').remove(), 1000);
+                
+                loop(); // Start Render Loop
+            } catch(e) {
+                logError("Audio Context Failed. " + e.message);
+                // Fallback loop if audio fails
+                loop();
+            }
         };
 
         window.toggleAudio = function(id, el) {
-            if(STATE.audioCtx.state === 'suspended') STATE.audioCtx.resume();
+            if(STATE.audioCtx && STATE.audioCtx.state === 'suspended') STATE.audioCtx.resume();
             
             const audio = document.getElementById(id);
             if(!audio.paused) {
@@ -342,7 +287,7 @@
             } else {
                 document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
                 document.querySelectorAll('.monolith').forEach(m => m.classList.remove('playing'));
-                audio.play();
+                audio.play().catch(e => logError("Play failed: " + e));
                 el.classList.add('playing');
             }
         };
@@ -354,7 +299,6 @@
             resize();
             initFlashTexts();
             
-            // Node Placement
             document.querySelectorAll('.node').forEach(n => {
                 n.style.transform = `translate3d(-50%, -50%, ${n.getAttribute('data-z')}px)`;
             });
@@ -368,21 +312,16 @@
                 this.x = Math.random() * w; this.y = Math.random() * h;
                 this.size = Math.random() * 2;
                 this.speed = Math.random() * 0.5 + 0.1;
-                this.z = Math.random() * 1000; // Fake depth
             }
             update() {
-                // Audio Reactivity
                 const boost = STATE.bass > 100 ? (STATE.bass / 255) * 5 : 0;
                 
-                // Act Behavior
                 if(STATE.act === 'danger') {
-                    this.x += (Math.random() - 0.5) * (5 + boost * 10); // Shake
+                    this.x += (Math.random() - 0.5) * (5 + boost * 10);
                     this.y += (Math.random() - 0.5) * (5 + boost * 10);
                 } else if (STATE.act === 'solution') {
-                    // Geometric Order (Up)
                     this.y -= (this.speed + boost);
                 } else {
-                    // Drift
                     this.y -= this.speed;
                 }
 
@@ -402,13 +341,12 @@
             STATE.targetScroll = window.scrollY;
             STATE.scroll += (STATE.targetScroll - STATE.scroll) * CONFIG.scrollLerp;
 
-            // Audio Analysis
             if(STATE.analyser) {
                 STATE.analyser.getByteFrequencyData(STATE.dataArray);
-                STATE.bass = STATE.dataArray[10]; // Low freq
+                STATE.bass = STATE.dataArray[10];
             }
 
-            // 1. Move World (Act 2 Shake Effect)
+            // 1. Move World
             let shakeX = 0, shakeY = 0;
             if(STATE.act === 'danger') {
                 shakeX = (Math.random() - 0.5) * (STATE.bass / 50);
@@ -416,24 +354,17 @@
             }
             world.style.transform = `translate3d(${shakeX}px, ${shakeY}px, ${-STATE.scroll.toFixed(2)}px)`;
 
-            // 2. Process Flash Texts
-            document.querySelectorAll('.flash-text').forEach(el => {
+            // 2. Flash Text Logic
+            const flashTexts = document.getElementsByClassName('flash-text');
+            for (let i = 0; i < flashTexts.length; i++) {
+                const el = flashTexts[i];
                 const z = parseInt(el.getAttribute('data-z'));
-                const x = parseInt(el.getAttribute('data-x'));
-                const y = parseInt(el.getAttribute('data-y'));
-                
-                // Absolute placement in tunnel
-                // Trick: Flash Texts are static children of world, so they move with world.
-                // We just place them initially.
-                el.style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, ${z}px)`;
-                
-                // Visibility Culling
                 const dist = Math.abs(z - STATE.scroll);
                 if(dist < 2000) el.style.opacity = 1 - (dist / 2000);
                 else el.style.opacity = 0;
-            });
+            }
 
-            // 3. Process Nodes & Act Detection
+            // 3. Node Logic
             let closest = Infinity;
             document.querySelectorAll('.node').forEach(node => {
                 const z = parseInt(node.getAttribute('data-z'));
@@ -441,7 +372,7 @@
                 
                 if(dist < closest) { closest = dist; STATE.act = node.getAttribute('data-act'); }
 
-                // Auto Fade Out Audio
+                // Auto Fade
                 if(dist > 1500) {
                     const audio = node.querySelector('audio');
                     if(audio && !audio.paused) {
@@ -450,7 +381,6 @@
                     }
                 }
 
-                // Opacity logic
                 if(dist < 3000) {
                     node.style.visibility = 'visible';
                     node.style.opacity = 1 - (dist/2500);
@@ -459,15 +389,15 @@
                 }
             });
 
-            // 4. Render Canvas & Atmosphere
-            let color = CONFIG.colors.gold;
+            // 4. Render
+            let color = '#d4af37';
             if(STATE.act === 'illusion') color = '#8a2be2';
             else if(STATE.act === 'danger') color = '#8a0a0a';
             else if(STATE.act === 'solution') color = '#ffffff';
             else if(STATE.act === 'matrix') color = '#00f0ff';
 
             ctx.fillStyle = '#000000';
-            ctx.globalAlpha = 0.8; // Trail effect
+            ctx.globalAlpha = 0.8;
             ctx.fillRect(0,0,w,h);
             ctx.globalAlpha = 1;
 
