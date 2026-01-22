@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Der Korridor</title>
+    <title>DEMOKRATIE 2.0 | Die Realität</title>
     <style>
         :root {
-            --void: #050505;
+            --void: #030303;
             --gold: #d4af37;
-            --gold-glow: rgba(212, 175, 55, 0.2);
-            --text-grey: #a0a0a0;
-            --glass: rgba(10, 10, 12, 0.98);
+            --gold-glow: rgba(212, 175, 55, 0.15);
+            --text-grey: #b0b0b0;
+            --danger: #d00000;
+            --glass: rgba(10, 10, 12, 0.96);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --font-serif: 'Georgia', serif; 
         }
@@ -22,7 +23,7 @@
             color: #fff;
             font-family: var(--font-main);
             overflow-x: hidden;
-            height: 50000px; /* Extrem langer Weg für ruhiges Lesen */
+            height: 60000px; /* Massive Tiefe für die Schwere der Themen */
             overscroll-behavior: none;
             cursor: default;
         }
@@ -32,13 +33,14 @@
         
         #vignette {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 40%, #000 130%);
-            z-index: 1; pointer-events: none;
+            background: radial-gradient(circle, transparent 30%, #000 110%);
+            z-index: 1; pointer-events: none; opacity: 0.9;
         }
 
+        /* --- TUNNEL ENGINE --- */
         #tunnel-viewport {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 1000px; z-index: 2; overflow: hidden;
+            perspective: 1200px; z-index: 2; overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
 
@@ -47,93 +49,95 @@
             transform-style: preserve-3d; will-change: transform;
         }
 
-        /* --- NODES (Central Content) --- */
+        /* --- NODES (The Audio Stations) --- */
         .node {
             position: absolute; top: 50%; left: 50%;
-            width: 80vw; max-width: 800px; text-align: center; opacity: 0;
+            width: 80vw; max-width: 900px; text-align: center; opacity: 0;
             transform: translate3d(-50%, -50%, 0); backface-visibility: hidden;
-            z-index: 100; /* Immer über den Texten an der Seite */
+            z-index: 100;
         }
 
-        /* --- MONUMENTS (The readable side-texts) --- */
+        /* --- MONUMENTS (The Pillars of Truth) --- */
         .monument {
             position: absolute; top: 50%; left: 50%;
-            width: 600px; text-align: left;
-            font-family: var(--font-serif);
-            font-size: 2.5rem; line-height: 1.2;
-            font-weight: 700; color: #333; /* Start dunkel */
-            transform-style: preserve-3d;
-            pointer-events: none;
-            transition: color 0.5s ease, opacity 0.5s ease;
+            width: 800px; text-align: left;
+            font-family: var(--font-main);
+            font-size: 3rem; line-height: 1.1;
+            font-weight: 800; color: #222; /* Initial dunkel */
+            text-transform: uppercase;
+            transform-style: preserve-3d; pointer-events: none;
+            transition: color 0.8s ease, text-shadow 0.8s ease;
             white-space: normal;
-            border-left: 5px solid var(--gold);
-            padding-left: 20px;
+            border-left: 8px solid #333;
+            padding-left: 40px;
         }
         
-        /* Wenn Monument nah ist (via JS gesteuert) */
-        .monument.active { color: #eee; opacity: 1; text-shadow: 0 0 30px rgba(0,0,0,1); }
+        /* Wenn Monument nah ist */
+        .monument.active { color: #f0f0f0; text-shadow: 0 0 50px rgba(0,0,0,1); border-color: var(--gold); }
+        .monument.danger { border-color: var(--danger); }
+        .monument.danger.active { color: #ffaaaa; }
 
-        /* --- MONOLITH UI (Player Cards) --- */
+        /* --- MONOLITH UI (The Player) --- */
         .monolith {
-            padding: 3rem; background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 0 0 1px #000, 0 30px 80px -10px rgba(0,0,0,0.8);
-            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            position: relative; overflow: hidden;
+            padding: 4rem; background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 1px #000, 0 40px 100px -20px rgba(0,0,0,0.9);
+            position: relative; overflow: hidden; 
+            transition: all 0.8s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
         .monolith::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--gold); opacity: 0.7;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--gold); opacity: 0.8;
         }
-        .monolith:hover { transform: scale(1.02) translateY(-10px); border-color: #666; }
-        .monolith.playing { border-color: var(--gold); box-shadow: 0 0 100px var(--gold-glow); }
+        .monolith:hover { transform: scale(1.02) translateY(-10px); border-color: rgba(255,255,255,0.3); }
+        .monolith.playing { border-color: var(--gold); box-shadow: 0 0 120px var(--gold-glow); }
 
         .btn {
-            display: inline-block; padding: 15px 30px; margin-top: 20px;
-            border: 1px solid #444; color: #aaa; text-transform: uppercase;
-            font-size: 0.8rem; letter-spacing: 0.2em; cursor: pointer; text-decoration: none;
+            display: inline-block; padding: 15px 40px; margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.2); color: #888; text-transform: uppercase;
+            font-size: 0.75rem; letter-spacing: 0.25em; cursor: pointer; text-decoration: none;
             transition: 0.3s; background: transparent;
         }
         .btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.05); }
-        .btn-primary { border-color: var(--gold); color: var(--gold); }
-        .btn-primary:hover { background: var(--gold); color: #000; }
+        .btn-play { border-color: var(--gold); color: var(--gold); font-weight: bold; }
+        .btn-play:hover { background: var(--gold); color: #000; }
 
         /* --- TYPOGRAPHY --- */
-        h1 { font-size: clamp(4rem, 10vw, 12rem); font-weight: 800; color: #fff; margin-bottom: 2rem; letter-spacing: -0.04em; }
-        h2 { font-size: 0.9rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 3rem; border-bottom: 1px solid #333; padding-bottom: 15px; display: inline-block; }
+        h1 { font-size: clamp(4rem, 10vw, 12rem); font-weight: 900; letter-spacing: -0.03em; color: #fff; margin-bottom: 2rem; }
+        h2 { font-size: 0.9rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 3rem; display: block; opacity: 0.9; }
         
-        .quote-main { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 300; line-height: 1.4; color: #ddd; margin-bottom: 1rem; }
-        .quote-sub { font-size: 0.8rem; color: #666; font-family: monospace; text-transform: uppercase; }
+        .quote-main { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; line-height: 1.4; color: #ddd; margin-bottom: 1rem; font-style: italic; }
+        .quote-sub { font-size: 0.9rem; color: #666; font-family: monospace; text-transform: uppercase; letter-spacing: 0.1em; }
 
-        /* --- SANCTUM LINKS --- */
-        .sanctum-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
-            margin-top: 3rem; text-align: left;
+        /* --- RESOURCE GRID (THE END) --- */
+        .resource-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;
+            margin-top: 4rem; text-align: left;
         }
-        .resource-link {
-            display: block; padding: 20px; border: 1px solid #333; text-decoration: none;
-            transition: 0.3s; background: rgba(255,255,255,0.02);
+        .resource-item {
+            padding: 2rem; border: 1px solid #333; text-decoration: none;
+            transition: 0.4s; background: rgba(255,255,255,0.02); display: block;
         }
-        .resource-link:hover { border-color: var(--gold); background: rgba(212,175,55,0.1); }
-        .resource-link strong { display: block; color: #fff; font-size: 1.1rem; margin-bottom: 5px; }
-        .resource-link span { color: #666; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+        .resource-item:hover { border-color: var(--gold); background: rgba(212,175,55,0.08); transform: translateY(-5px); }
+        .resource-type { display: block; font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.8rem; }
+        .resource-title { display: block; font-size: 1.2rem; color: #fff; font-weight: 600; line-height: 1.3; }
 
         /* --- OVERLAYS --- */
         #data-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 9999;
+            background: rgba(0,0,0,0.97); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
         }
         #data-overlay.active { opacity: 1; pointer-events: all; }
         .data-card {
-            width: 80%; max-width: 900px; max-height: 90vh; overflow-y: auto;
-            padding: 5rem; border-left: 4px solid var(--gold);
-            background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+            width: 80%; max-width: 900px; max-height: 85vh; overflow-y: auto;
+            padding: 5rem; border-left: 6px solid var(--gold);
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
         }
-        .data-content h3 { font-size: 2.5rem; color: var(--gold); margin-bottom: 2rem; }
-        .data-content p { font-size: 1.2rem; line-height: 1.7; color: #ccc; margin-bottom: 1.5rem; }
-        .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2rem; color: #666; cursor: pointer; }
+        .data-content h3 { font-size: 3rem; color: var(--gold); margin-bottom: 2rem; line-height: 1; }
+        .data-content p { font-size: 1.3rem; line-height: 1.8; color: #ccc; margin-bottom: 2rem; }
+        .close-btn { position: absolute; top: 40px; right: 50px; font-size: 2rem; color: #555; cursor: pointer; }
         .close-btn:hover { color: #fff; }
 
         #start-screen {
@@ -142,7 +146,7 @@
         }
         .init-btn {
             border: 1px solid #fff; padding: 25px 80px; color: #fff;
-            font-size: 1rem; letter-spacing: 0.5em; cursor: pointer; transition: 0.5s;
+            font-size: 1.1rem; letter-spacing: 0.4em; cursor: pointer; transition: 0.5s;
             text-transform: uppercase; background: #000;
         }
         .init-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
@@ -150,7 +154,7 @@
         ::-webkit-scrollbar { width: 0; }
     </style>
     
-    <script src="./dist/bundles/anime.umd.js"></script>
+    <script src="./anime-lib/dist/bundles/anime.umd.js"></script>
 </head>
 <body>
 
@@ -162,8 +166,8 @@
     </div>
 
     <div id="start-screen">
-        <div class="init-btn" onclick="initializeCorridor()">ARCHIV ÖFFNEN</div>
-        <p style="margin-top:20px; color:#444; font-family:monospace;">AUDIO + GPU REQ</p>
+        <div class="init-btn" onclick="initializeSystem()">SYSTEM ZUGRIFF</div>
+        <p style="margin-top:30px; color:#444; font-family:monospace;">AUDIO + GPU ERFORDERLICH</p>
     </div>
 
     <canvas id="starfield"></canvas>
@@ -176,62 +180,62 @@
 
             <section class="node" data-z="0" data-act="prolog">
                 <h1>STASIS</h1>
-                <p class="quote-main">Wir leben in einer fortwährenden Aristokratie.</p>
-                <div style="margin-top: 15rem; font-size: 0.7rem; letter-spacing: 0.4em; opacity: 0.5;">SCROLLEN UM EINZUTRETEN</div>
+                <p class="quote-main">"Wir leben in einer fortwährenden Aristokratie."</p>
+                <div style="margin-top: 15rem; font-size: 0.7rem; letter-spacing: 0.4em; opacity: 0.5;">SCROLLEN ZUM EINTAUCHEN</div>
             </section>
 
-            <section class="node" data-z="8000" data-act="illusion">
+            <section class="node" data-z="10000" data-act="illusion">
                 <h2>PHASE I: DIE ILLUSION</h2>
                 <audio id="audio-1" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" preload="auto"></audio>
                 
                 <div class="monolith">
                     <div class="quote-main">"Bildungsideale sind die Geißel der Menschheit."</div>
-                    <div class="quote-sub">FILE: 2_Bildungsadel.m4a</div>
+                    <div class="quote-sub">AKTE 2: BILDUNGSADEL</div>
                     
                     <div class="action-bar">
-                        <div class="btn btn-primary" onclick="toggleAudio('audio-1', this.parentNode.parentNode)">▶ ABSPIELEN</div>
+                        <div class="btn btn-play" onclick="toggleAudio('audio-1', this.parentNode.parentNode)">▶ ABSPIELEN</div>
                         <div class="btn" onclick="openData('bildung')">✚ ANALYSE</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="16000" data-act="danger">
-                <h2 style="color:#ff4444; border-color:#ff4444;">PHASE II: DER BRAND</h2>
+            <section class="node" data-z="20000" data-act="danger">
+                <h2 style="color:var(--danger); border-color:var(--danger);">PHASE II: DER BRAND</h2>
                 <audio id="audio-2" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" preload="auto"></audio>
                 
-                <div class="monolith" style="border-top-color: #ff4444;">
-                    <div class="quote-main">"Parteien sind Brandbeschleuniger für Diktaturen."</div>
-                    <div class="quote-sub" style="color:#ff4444;">FILE: 3_Brandbeschleuniger.m4a</div>
+                <div class="monolith" style="border-top-color: var(--danger);">
+                    <div class="quote-main" style="color:#ffaaaa;">"Parteien sind Brandbeschleuniger für Diktaturen."</div>
+                    <div class="quote-sub" style="color:var(--danger);">AKTE 3: HISTORISCHE EVIDENZ</div>
                     
                     <div class="action-bar">
-                        <div class="btn" style="border-color:#ff4444; color:#ff4444;" onclick="toggleAudio('audio-2', this.parentNode.parentNode)">▶ WARNUNG</div>
-                        <div class="btn" style="border-color:#ff4444; color:#ff4444;" onclick="openData('parteien')">✚ FAKTEN</div>
+                        <div class="btn" style="border-color:var(--danger); color:var(--danger);" onclick="toggleAudio('audio-2', this.parentNode.parentNode)">▶ WARNUNG</div>
+                        <div class="btn" style="border-color:var(--danger); color:var(--danger);" onclick="openData('parteien')">✚ BEWEISFÜHRUNG</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="24000" data-act="void">
-                <h2>PHASE III: DER UNBEGRIFF</h2>
+            <section class="node" data-z="30000" data-act="void">
+                <h2>PHASE III: DAS VAKUUM</h2>
                 <audio id="audio-3" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" preload="auto"></audio>
                 
                 <div class="monolith">
                     <div class="quote-main">"Politiker machen keine Politik."</div>
-                    <div class="quote-sub">FILE: 1_Dienstleister.m4a</div>
+                    <div class="quote-sub">AKTE 1: DER UNBEGRIFF</div>
                     
                     <div class="action-bar">
-                        <div class="btn btn-primary" onclick="toggleAudio('audio-3', this.parentNode.parentNode)">▶ ABSPIELEN</div>
+                        <div class="btn btn-play" onclick="toggleAudio('audio-3', this.parentNode.parentNode)">▶ ABSPIELEN</div>
                         <div class="btn" onclick="openData('politiker')">✚ ANALYSE</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="32000" data-act="solution">
-                <h1 style="font-size: 8rem; text-shadow: 0 0 100px rgba(255,255,255,0.5);">ISONOMIE</h1>
+            <section class="node" data-z="40000" data-act="solution">
+                <h1 style="font-size: 8rem; text-shadow: 0 0 100px rgba(255,255,255,0.6);">ISONOMIE</h1>
                 <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" preload="auto"></audio>
                 
                 <div class="monolith" style="background: rgba(255,255,255,0.05); border-top-color: #fff;">
                     <div class="quote-main" style="color:#fff;">"Der einzige Schutz vor Faschismus."</div>
-                    <div class="quote-sub" style="color:#aaa;">FILE: 4_Losdemokratie.m4a</div>
+                    <div class="quote-sub" style="color:#aaa;">AKTE 4: LÖSUNG</div>
                     
                     <div class="action-bar">
                         <div class="btn" style="border-color:#fff; color:#fff;" onclick="toggleAudio('audio-4', this.parentNode.parentNode)">▶ MANIFESTO</div>
@@ -240,31 +244,31 @@
                 </div>
             </section>
 
-            <section class="node" data-z="40000" data-act="matrix">
+            <section class="node" data-z="50000" data-act="matrix">
                 <h2 style="color:var(--gold); border-color:var(--gold);">DAS SANCTUM</h2>
                 
-                <div class="monolith" style="max-width: 1000px; width: 90vw; padding: 3rem;">
-                    <p style="color:#888; text-align:left; max-width:100%; margin-bottom:2rem;">
-                        Dies ist das Ende der Geschichte. Und der Anfang der Politik.<br>
-                        Nutze diese Ressourcen zum Wiederaufbau.
+                <div class="monolith" style="max-width: 1200px; width: 90vw; padding: 4rem;">
+                    <p style="color:#bbb; font-size:1.5rem; margin-bottom:3rem;">
+                        Die Werkzeuge für den Wiederaufbau liegen bereit.<br>
+                        Es gibt keine Ausreden mehr.
                     </p>
                     
-                    <div class="sanctum-grid">
-                        <a href="https://losdemokratie.de/" target="_blank" class="resource-link">
-                            <span>DAS PROJEKT</span>
-                            <strong>LOSDEMOKRATIE.DE</strong>
+                    <div class="resource-grid">
+                        <a href="https://losdemokratie.de/" target="_blank" class="resource-item">
+                            <span class="resource-type">ZENTRALE</span>
+                            <span class="resource-title">LOSDEMOKRATIE.DE</span>
                         </a>
-                        <a href="https://www.youtube.com/@nuttlos" target="_blank" class="resource-link">
-                            <span>DER KANAL</span>
-                            <strong>NUTT LOS (YOUTUBE)</strong>
+                        <a href="https://www.youtube.com/@nuttlos" target="_blank" class="resource-item">
+                            <span class="resource-type">VISUELLER KANAL</span>
+                            <span class="resource-title">NUTT LOS (YOUTUBE)</span>
                         </a>
-                        <a href="https://www.amazon.de/Gegen-Wahlen-Warum-Abstimmen-demokratisch/dp/3835318713" target="_blank" class="resource-link">
-                            <span>DIE BASIS</span>
-                            <strong>GEGEN WAHLEN (BUCH)</strong>
+                        <a href="https://www.amazon.de/Gegen-Wahlen-Warum-Abstimmen-demokratisch/dp/3835318713" target="_blank" class="resource-item">
+                            <span class="resource-type">LITERATUR</span>
+                            <span class="resource-title">CODEX: GEGEN WAHLEN</span>
                         </a>
-                        <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="resource-link">
-                            <span>DER BEWEIS</span>
-                            <strong>SYSTEM-VALIDIERUNG (PDF)</strong>
+                        <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="resource-item">
+                            <span class="resource-type">VALIDIERUNG</span>
+                            <span class="resource-title">TECHNISCHE MATRIX (PDF)</span>
                         </a>
                     </div>
                 </div>
@@ -274,47 +278,49 @@
     </div>
 
     <script>
-        // --- MONUMENTS DATA (BIG READABLE QUOTES) ---
+        // --- REAL QUOTES FROM YOUR TEXTS ---
         const MONUMENTS = [
-            // Akt 1
-            {t:"NEUER ADEL", z:3000, x:-500}, 
-            {t:"BILDUNG IST EXKLUSION", z:4500, x:500},
-            {t:"PLATONISCHER IRRTUM", z:6000, x:-500},
+            // Akt 1 (Illusion / Bildung)
+            {t:"UNSERE KULTUR IST GETRIEBEN VON EINER IDIOTISCHEN FANTASIE", z:4000, x:-600},
+            {t:"BILDUNG ALS HERRSCHAFTSINSTRUMENT", z:6000, x:600},
+            {t:"WIR HABEN EINEN NEUEN ADEL GESCHAFFEN", z:8000, x:-600},
             
-            // Akt 2
-            {t:"PARTEIEN SIND DIKTATUREN", z:11000, x:500},
-            {t:"MACHT GEBIERT TYRANNEI", z:13000, x:-500},
-            {t:"WAHLEN SIND ARISTOKRATISCH", z:15000, x:500},
+            // Akt 2 (Brand / Parteien)
+            {t:"PARTEIEN SIND INTERN DIKTATUREN", z:14000, x:600, type:'danger'},
+            {t:"MACHTKAMPF GEBIERT TYRANNEI", z:16000, x:-600, type:'danger'},
+            {t:"WAHLEN VERHINDERN KEINE DIKTATUR", z:18000, x:600, type:'danger'},
             
-            // Akt 3
-            {t:"POLITIKER SIND DIENSTLEISTER", z:19000, x:-500},
-            {t:"LEGITIMATIONS KRISE", z:21000, x:500},
-            {t:"WIR SIND UNPOLITISCH", z:23000, x:-500},
+            // Akt 3 (Politik)
+            {t:"WIR SIND EINE GESELLSCHAFT OHNE POLITIK", z:24000, x:-600},
+            {t:"GEWÄHLTE ARISTOKRATEN", z:26000, x:600},
+            {t:"POLITIK IST KEIN BERUF", z:28000, x:-600},
             
-            // Akt 4
-            {t:"WIR REGIEREN UNS SELBST", z:27000, x:500},
-            {t:"KEIN KARRIERISMUS", z:29000, x:-500},
-            {t:"SOUVERÄNITÄT", z:31000, x:500},
-            {t:"SYSTEM ONLINE", z:36000, x:0}
+            // Akt 4 (Lösung)
+            {t:"WIR MÜSSEN ALLE REGIEREN", z:34000, x:600, type:'solution'},
+            {t:"STRUKTURELLE UNBESTECHLICHKEIT", z:36000, x:-600, type:'solution'},
+            {t:"DIE EINZIGE EXIT-OPTION", z:38000, x:600, type:'solution'},
+            
+            // Finale
+            {t:"ENDE DER GESCHICHTE", z:45000, x:0, type:'final'}
         ];
 
-        // --- CONTENT DATA ---
         const CONTENT = {
-            'bildung': {title: 'Der Bildungs-Adel', text: 'Unsere Kultur ist getrieben von der idiotischen Fantasie, dass Bildung ein Kriterium für Herrschaft sein sollte. Das ist purer Platonismus. Wir halten Individuen frei von Arbeit, damit sie sich "bilden" und dann über uns herrschen. Demokratie bedeutet: JEDER ist fähig zu herrschen.'},
-            'parteien': {title: 'Brandbeschleuniger', text: 'Parteien sind intern Diktaturen. Wer in eine Partei eintritt, gibt sein Gewissen an der Garderobe ab. Historisch gesehen verhindern Parteien keine Diktaturen – sie gebären sie.'},
-            'politiker': {title: 'Der Dienstleister', text: 'Der Begriff "Politiker" ist ein Symptom des Verfalls. Was wir heute haben, sind gewählte Aristokraten. Politik ist eine Praxis, kein Beruf.'},
-            'los': {title: 'Die Lösung', text: 'Wenn wir alle regieren, kann kein Tyrann entstehen. Die Losdemokratie ist das einzige System, das Korruption strukturell unmöglich macht.'}
+            'bildung': {title: 'Der Bildungs-Adel', text: 'Unsere Kultur ist getrieben von der idiotischen Fantasie, dass Bildung ein Kriterium für Herrschaft sein sollte. Das ist purer Platonismus. Wir halten Individuen frei von Arbeit (Aristokraten), damit sie sich "bilden" und dann über uns herrschen. Demokratie bedeutet: JEDER ist fähig zu herrschen.'},
+            'parteien': {title: 'Brandbeschleuniger', text: 'Parteien sind intern Diktaturen. Wer in eine Partei eintritt, gibt sein Gewissen an der Garderobe ab. Historisch gesehen verhindern Parteien keine Diktaturen – sie gebären sie. Wenn sich die Gesellschaft spaltet und Parteien gegeneinander Krieg führen, ist der Ruf nach dem "starken Mann" die logische Konsequenz.'},
+            'politiker': {title: 'Der Dienstleister', text: 'Der Begriff "Politiker" ist ein Symptom des Verfalls. In einer Demokratie gibt es keine Politiker, weil ALLE Politiker sind. Was wir heute haben, sind gewählte Aristokraten. Politik ist eine Praxis, kein Beruf.'},
+            'los': {title: 'Die Kinetische Lösung', text: 'Wenn wir alle regieren, kann kein Tyrann entstehen. Die Losdemokratie ist das einzige System, das Korruption strukturell unmöglich macht. Niemand kann "Karriere" machen. Niemand muss wiedergewählt werden. Es zählt nur das Sachproblem.'}
         };
 
         const STATE = { scroll: 0, target: 0, w: 0, h: 0, act: 'prolog', audioCtx: null, analyser: null, data: null, activeAudio: null };
-        const CONFIG = { lerp: 0.04 }; // Smooth Heavy Physics
+        // HEAVY PHYSICS: Niedriger Lerp-Wert für "Schwere"
+        const CONFIG = { lerp: 0.04 }; 
 
         const world = document.getElementById('tunnel-world');
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
 
         // --- INIT ---
-        window.initializeCorridor = function() {
+        window.initializeSystem = function() {
             window.scrollTo(0,0);
             try {
                 STATE.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -338,15 +344,11 @@
             MONUMENTS.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'monument';
+                if(item.type === 'danger') el.classList.add('danger');
                 el.textContent = item.t;
-                // Positionierung an den Wänden
+                // Positionierung: Weit an der Seite
                 el.style.transform = `translate3d(-50%, -50%, 0) translate3d(${item.x}px, 0, ${item.z}px)`;
                 el.setAttribute('data-z', item.z);
-                
-                // Color Logic
-                if(item.z > 10000 && item.z < 17000) { el.style.borderLeftColor = '#ff4444'; el.style.color = '#500'; }
-                if(item.z > 26000) { el.style.borderLeftColor = '#fff'; el.style.color = '#555'; }
-                
                 container.appendChild(el);
             });
         }
@@ -361,81 +363,78 @@
         }
         init();
 
-        // --- STARFIELD (ZOOM IN EFFECT) ---
+        // --- PARTICLES (ZOOM IN - STARS MOVE TOWARDS YOU) ---
         class Star {
             constructor() { this.reset(); }
             reset() {
                 this.x = (Math.random() - 0.5) * STATE.w * 3;
                 this.y = (Math.random() - 0.5) * STATE.h * 3;
-                this.z = Math.random() * 2000 + 500; 
-                this.size = Math.random() * 2;
+                this.z = Math.random() * 2000 + 500; // Start far
+                this.size = Math.random() * 2 + 0.5;
             }
             update(speed) {
-                // MOVE TOWARDS CAMERA (Zoom In)
-                this.z -= (2 + speed * 1.5);
+                // NEGATIVE Z SPEED = ZOOM IN
+                this.z -= (3 + speed * 2);
                 if(this.z < 1) this.reset();
             }
             draw() {
-                const scale = 800 / this.z;
+                const scale = 1000 / this.z;
                 const x2d = this.x * scale + STATE.w/2;
                 const y2d = this.y * scale + STATE.h/2;
-                ctx.fillStyle = '#fff';
+                
+                ctx.fillStyle = STATE.act === 'danger' ? '#aa3333' : '#d4af37';
                 ctx.globalAlpha = Math.min(1, (2000-this.z)/1000);
                 ctx.fillRect(x2d, y2d, this.size*scale, this.size*scale);
             }
         }
-        const stars = Array.from({length: 300}, () => new Star());
+        const stars = Array.from({length: 250}, () => new Star());
 
-        // --- LOOP ---
+        // --- RENDER LOOP ---
         function render() {
             STATE.target = window.scrollY;
             const diff = STATE.target - STATE.scroll;
             STATE.scroll += diff * CONFIG.lerp;
             const speed = Math.abs(diff);
 
-            // AUDIO BASS
+            // Audio Analysis
             let bass = 0;
             if(STATE.analyser) {
                 STATE.analyser.getByteFrequencyData(STATE.data);
                 bass = STATE.data[10];
             }
 
-            // CAMERA MOVEMENT
-            // Wir bewegen die Welt auf uns zu (Negative Z)
+            // TUNNEL MOVEMENT (Negative Z = Moving Forward)
             world.style.transform = `translate3d(0, 0, ${-STATE.scroll.toFixed(2)}px)`;
 
-            // ELEMENT LOGIC
+            // LOGIC
             document.querySelectorAll('.node').forEach(n => {
                 const z = parseInt(n.getAttribute('data-z'));
                 const dist = Math.abs(z - STATE.scroll);
                 if(dist < 3000) STATE.act = n.getAttribute('data-act');
 
-                if(dist < 4000) {
+                if(dist < 4500) {
                     n.style.visibility = 'visible';
-                    n.style.opacity = 1 - (dist / 3500);
+                    n.style.opacity = 1 - (dist / 4000);
                 } else {
                     n.style.visibility = 'hidden';
                 }
 
-                // Audio Stop
                 if(STATE.activeAudio && dist > 3000) {
                     const a = document.getElementById(STATE.activeAudio);
                     if(a && !a.paused) { a.pause(); document.querySelector('.monolith.playing').classList.remove('playing'); }
                 }
             });
 
-            // MONUMENT LOGIC (LESBARKEIT)
+            // MONUMENT VISIBILITY
             document.querySelectorAll('.monument').forEach(m => {
                 const z = parseInt(m.getAttribute('data-z'));
-                // Berechne relative Distanz zur Kamera
                 const relZ = z - STATE.scroll; 
-                
-                // Sichtbar wenn vor der Kamera (0 bis 3000)
-                if(relZ > -500 && relZ < 3000) {
-                    const opacity = 1 - (relZ / 2500);
+                // Visible when slightly in front or behind camera
+                if(relZ > -1000 && relZ < 3500) {
+                    const opacity = 1 - (relZ / 3000);
                     m.style.opacity = opacity;
-                    // Aktiviere Highlight wenn sehr nah (Lesebereich)
-                    if(relZ < 1000 && relZ > 0) m.classList.add('active');
+                    // Active Range for Reading
+                    if(relZ < 1200 && relZ > -200) m.classList.add('active');
                     else m.classList.remove('active');
                 } else {
                     m.style.opacity = 0;
