@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMOKRATIE 2.0 | Die Kathedrale</title>
+    <title>DEMOKRATIE 2.0 | Das Sanctum</title>
     <style>
         :root {
-            --void: #000000;
+            --void: #020202;
             --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.1);
+            --gold-glow: rgba(212, 175, 55, 0.3);
             --danger: #cf3030;
             --toxin: #8a2be2;
             --tech: #00f0ff;
-            --glass: rgba(10, 10, 10, 0.92);
+            --glass: rgba(8, 8, 8, 0.95);
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -23,7 +23,7 @@
             color: #fff;
             font-family: var(--font-main);
             overflow-x: hidden;
-            height: 40000px; /* Gigantische Tiefe für den "Muser"-Modus */
+            height: 45000px; /* Gigantische Tiefe für den Muser-Flow */
             overscroll-behavior: none;
             cursor: crosshair;
         }
@@ -31,15 +31,21 @@
         /* --- LAYERS --- */
         #starfield { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
         
-        #fog {
+        #vignette {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 20%, #000000 100%);
-            z-index: 1; pointer-events: none; opacity: 0.9;
+            background: radial-gradient(circle, transparent 30%, #000 120%);
+            z-index: 1; pointer-events: none; opacity: 0.8;
+        }
+
+        #scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 1; pointer-events: none; opacity: 0.2;
         }
 
         #tunnel-viewport {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            perspective: 1200px; z-index: 2; overflow: hidden;
+            perspective: 1000px; z-index: 2; overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
 
@@ -48,7 +54,7 @@
             transform-style: preserve-3d; will-change: transform;
         }
 
-        /* --- NODES (The Pillars) --- */
+        /* --- NODES --- */
         .node {
             position: absolute; top: 50%; left: 50%;
             width: 80vw; max-width: 900px; text-align: center; opacity: 0;
@@ -56,12 +62,12 @@
             z-index: 10;
         }
 
-        /* --- THE DEBRIS FIELD (Floating Text) --- */
+        /* --- DEBRIS (FLOATING TRUTH) --- */
         .debris {
             position: absolute; top: 50%; left: 50%;
-            font-size: 1.5rem; font-weight: 700; color: rgba(255,255,255,0.15);
+            font-size: 1.2rem; font-weight: 700; color: rgba(255,255,255,0.1);
             white-space: nowrap; pointer-events: none; text-transform: uppercase;
-            transform-style: preserve-3d; font-family: monospace; letter-spacing: 0.2em;
+            transform-style: preserve-3d; font-family: monospace; letter-spacing: 0.1em;
             text-shadow: 0 0 10px rgba(0,0,0,1);
         }
 
@@ -82,40 +88,55 @@
         }
 
         .monolith:hover { border-color: rgba(212,175,55,0.5); transform: scale(1.02) translateZ(50px); }
-        .monolith.playing { border-color: var(--gold); box-shadow: 0 0 100px var(--gold-dim); }
+        .monolith.playing { border-color: var(--gold); box-shadow: 0 0 80px var(--gold-glow); }
 
-        .expand-btn {
-            display: inline-block; margin-top: 30px; padding: 15px 40px; 
-            border: 1px solid rgba(255,255,255,0.2); color: #fff; 
-            font-size: 0.8rem; letter-spacing: 0.3em; cursor: pointer;
-            transition: 0.4s; text-transform: uppercase;
+        .action-bar { margin-top: 3rem; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 15px 30px; border: 1px solid rgba(255,255,255,0.2); color: #ccc;
+            font-size: 0.7rem; letter-spacing: 0.25em; cursor: pointer; text-decoration: none;
+            transition: 0.3s; text-transform: uppercase; background: transparent; display: inline-block;
         }
-        .expand-btn:hover { background: var(--gold); border-color: var(--gold); color: #000; }
+        .btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.05); }
+        .btn-primary { border-color: var(--gold); color: var(--gold); }
+        .btn-primary:hover { background: var(--gold); color: #000; box-shadow: 0 0 40px var(--gold-glow); }
 
         /* --- TYPOGRAPHY --- */
-        h1 { font-size: clamp(4rem, 10vw, 12rem); font-weight: 900; letter-spacing: -0.02em; color: #fff; margin-bottom: 2rem; }
-        h2 { font-size: 1rem; letter-spacing: 0.8em; text-transform: uppercase; color: var(--gold); margin-bottom: 4rem; border-top: 1px solid var(--gold); display: inline-block; padding-top: 10px; }
+        h1 { font-size: clamp(4rem, 10vw, 12rem); font-weight: 900; letter-spacing: -0.03em; color: #fff; margin-bottom: 2rem; }
+        h2 { font-size: 0.9rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 3rem; opacity: 0.8; }
         
         .quote-main { font-size: 1.8rem; font-weight: 300; line-height: 1.4; color: #eee; margin-bottom: 1rem; }
-        .quote-sub { font-size: 0.9rem; color: #666; font-family: monospace; text-transform: uppercase; letter-spacing: 0.1em; }
+        .quote-sub { font-size: 0.8rem; color: #666; font-family: monospace; text-transform: uppercase; letter-spacing: 0.1em; }
 
-        /* --- DEEP DATA OVERLAY --- */
+        /* --- SANCTUM (ENDCARD) --- */
+        .sanctum-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;
+            margin-top: 3rem; border-top: 1px solid #333; padding-top: 3rem;
+        }
+        .sanctum-item {
+            border: 1px solid rgba(255,255,255,0.1); padding: 2rem; text-align: center;
+            transition: 0.3s; cursor: pointer; text-decoration: none; display: block;
+        }
+        .sanctum-item:hover { border-color: var(--gold); background: rgba(212,175,55,0.05); transform: translateY(-5px); }
+        .sanctum-icon { font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--gold); }
+        .sanctum-title { color: #fff; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; display: block; }
+
+        /* --- DATA OVERLAY --- */
         #data-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.96); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.6s ease;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
         }
         #data-overlay.active { opacity: 1; pointer-events: all; }
-        
         .data-card {
-            width: 80%; max-width: 1000px; max-height: 90vh; overflow-y: auto;
-            padding: 5rem; border-right: 4px solid var(--gold);
-            background: linear-gradient(90deg, rgba(10,10,10,1) 0%, rgba(20,20,20,1) 100%);
+            width: 80%; max-width: 900px; max-height: 90vh; overflow-y: auto;
+            padding: 5rem; border-left: 4px solid var(--gold);
+            background: linear-gradient(90deg, rgba(15,15,15,1) 0%, rgba(25,25,25,1) 100%);
         }
-        .data-content h3 { font-size: 3rem; color: var(--gold); margin-bottom: 2rem; text-transform: uppercase; }
-        .data-content p { font-size: 1.2rem; line-height: 1.8; color: #bbb; margin-bottom: 2rem; max-width: 800px; }
-        .close-data { position: absolute; top: 40px; left: 40px; font-size: 2rem; color: #444; cursor: pointer; }
+        .data-content h3 { font-size: 2.5rem; color: var(--gold); margin-bottom: 2rem; text-transform: uppercase; }
+        .data-content p { font-size: 1.1rem; line-height: 1.8; color: #bbb; margin-bottom: 1.5rem; }
+        .close-data { position: absolute; top: 40px; right: 40px; font-size: 1.5rem; color: #555; cursor: pointer; }
         .close-data:hover { color: #fff; }
 
         /* --- START SCREEN --- */
@@ -128,9 +149,8 @@
             font-size: 1rem; letter-spacing: 0.5em; cursor: pointer; transition: 0.5s;
             text-transform: uppercase; background: #000;
         }
-        .init-btn:hover { background: #fff; color: #000; }
+        .init-btn:hover { background: #fff; color: #000; box-shadow: 0 0 60px rgba(255,255,255,0.3); }
 
-        /* SCROLL HIDE */
         ::-webkit-scrollbar { width: 0; }
     </style>
     
@@ -139,19 +159,20 @@
 <body>
 
     <div id="data-overlay">
-        <div class="close-data" onclick="closeData()">× SCHLIESSEN</div>
+        <div class="close-data" onclick="closeData()">× ESC</div>
         <div class="data-card">
             <div id="data-content-inject" class="data-content"></div>
         </div>
     </div>
 
     <div id="start-screen">
-        <div class="init-btn" onclick="initializeCathedral()">SYSTEM STARTEN</div>
+        <div class="init-btn" onclick="initializeSanctum()">SYSTEM INITIALISIEREN</div>
         <p style="margin-top:30px; color:#444; font-family:monospace;">AUDIO + GPU</p>
     </div>
 
     <canvas id="starfield"></canvas>
-    <div id="fog"></div>
+    <div id="vignette"></div>
+    <div id="scanlines"></div>
 
     <div id="tunnel-viewport">
         <div id="tunnel-world">
@@ -160,11 +181,11 @@
 
             <section class="node" data-z="0" data-act="prolog">
                 <h1>STASIS</h1>
-                <p class="quote-main">Die fortwährende Aristokratie.</p>
-                <div style="margin-top: 15rem; font-size: 0.8rem; letter-spacing: 0.4em; opacity: 0.5;">SCROLLEN ZUM EINTAUCHEN</div>
+                <p class="quote-main">Der politische Stillstand ist gewollt.</p>
+                <div style="margin-top: 15rem; font-size: 0.7rem; letter-spacing: 0.4em; opacity: 0.5;">SCROLLEN ZUM EINTAUCHEN</div>
             </section>
 
-            <section class="node" data-z="6000" data-act="illusion">
+            <section class="node" data-z="7000" data-act="illusion">
                 <h2>PHASE I: DIE ILLUSION</h2>
                 <audio id="audio-1" src="./2Wie_Bildung_einen_neuen_Adel_schafft.m4a" preload="auto"></audio>
                 
@@ -172,14 +193,14 @@
                     <div class="quote-main">"Bildungsideale sind die Geißel der Menschheit."</div>
                     <div class="quote-sub">FILE: 2_Bildungsadel.m4a</div>
                     
-                    <div style="margin-top: 3rem; display:flex; justify-content:center; gap:20px;">
-                        <div class="expand-btn" onclick="toggleAudio('audio-1', this.parentNode.parentNode)">▶ ABSPIELEN</div>
-                        <div class="expand-btn" onclick="openData('bildung')">✚ ANALYSE</div>
+                    <div class="action-bar">
+                        <div class="btn btn-primary" onclick="toggleAudio('audio-1', this.parentNode.parentNode)">▶ ABSPIELEN</div>
+                        <div class="btn" onclick="openData('bildung')">✚ ANALYSE</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="12000" data-act="danger">
+            <section class="node" data-z="14000" data-act="danger">
                 <h2 style="color:var(--danger); border-color:var(--danger);">PHASE II: DER BRAND</h2>
                 <audio id="audio-2" src="./3Parteien_als_historischer_Brandbeschleuniger_fuer_Diktaturen.m4a" preload="auto"></audio>
                 
@@ -187,68 +208,71 @@
                     <div class="quote-main" style="color: #ffbdbd;">"Parteien sind Brandbeschleuniger für Diktaturen."</div>
                     <div class="quote-sub" style="color: var(--danger);">FILE: 3_Brandbeschleuniger.m4a</div>
                     
-                    <div style="margin-top: 3rem; display:flex; justify-content:center; gap:20px;">
-                        <div class="expand-btn" style="border-color:var(--danger); color:var(--danger);" onclick="toggleAudio('audio-2', this.parentNode.parentNode)">▶ WARNUNG</div>
-                        <div class="expand-btn" style="border-color:var(--danger); color:var(--danger);" onclick="openData('parteien')">✚ FAKTEN</div>
+                    <div class="action-bar">
+                        <div class="btn" style="border-color:var(--danger); color:var(--danger);" onclick="toggleAudio('audio-2', this.parentNode.parentNode)">▶ WARNUNG</div>
+                        <div class="btn" style="border-color:var(--danger); color:var(--danger);" onclick="openData('parteien')">✚ BEWEISFÜHRUNG</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="18000" data-act="void">
-                <h2>PHASE III: DER UNBEGRIFF</h2>
+            <section class="node" data-z="21000" data-act="void">
+                <h2>PHASE III: DAS VAKUUM</h2>
                 <audio id="audio-3" src="./1Warum_Politiker_eigentlich_keine_Politik_machen.m4a" preload="auto"></audio>
                 
                 <div class="monolith">
                     <div class="quote-main">"Politiker machen keine Politik."</div>
                     <div class="quote-sub">FILE: 1_Dienstleister.m4a</div>
                     
-                    <div style="margin-top: 3rem; display:flex; justify-content:center; gap:20px;">
-                        <div class="expand-btn" onclick="toggleAudio('audio-3', this.parentNode.parentNode)">▶ ABSPIELEN</div>
-                        <div class="expand-btn" onclick="openData('politiker')">✚ ANALYSE</div>
+                    <div class="action-bar">
+                        <div class="btn btn-primary" onclick="toggleAudio('audio-3', this.parentNode.parentNode)">▶ ABSPIELEN</div>
+                        <div class="btn" onclick="openData('politiker')">✚ ANALYSE</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="24000" data-act="solution">
-                <h1 style="font-size: 8rem; text-shadow: 0 0 120px white;">ISONOMIE</h1>
+            <section class="node" data-z="28000" data-act="solution">
+                <h1 style="font-size: 8rem; text-shadow: 0 0 100px white;">ISONOMIE</h1>
                 <audio id="audio-4" src="./4Losdemokratie_als_einziger_Schutz_vor_Faschismus.m4a" preload="auto"></audio>
                 
                 <div class="monolith" style="background: rgba(255,255,255,0.05); border-color: #fff;">
                     <div class="quote-main" style="color:#fff;">"Der einzige Schutz vor Faschismus."</div>
                     <div class="quote-sub" style="color:#aaa;">FILE: 4_Losdemokratie.m4a</div>
                     
-                    <div style="margin-top: 3rem; display:flex; justify-content:center; gap:20px;">
-                        <div class="expand-btn" style="border-color:#fff; color:#fff;" onclick="toggleAudio('audio-4', this.parentNode.parentNode)">▶ MANIFESTO</div>
-                        <div class="expand-btn" style="border-color:#fff; color:#fff;" onclick="openData('los')">✚ BLUEPRINT</div>
+                    <div class="action-bar">
+                        <div class="btn" style="border-color:#fff; color:#fff;" onclick="toggleAudio('audio-4', this.parentNode.parentNode)">▶ MANIFESTO</div>
+                        <div class="btn" style="border-color:#fff; color:#fff;" onclick="openData('los')">✚ BLUEPRINT</div>
                     </div>
                 </div>
             </section>
 
-            <section class="node" data-z="30000" data-act="matrix">
-                <h2 style="color:var(--tech); border-color:var(--tech);">SYSTEM STATUS: ONLINE</h2>
+            <section class="node" data-z="35000" data-act="matrix">
+                <h2 style="color:var(--tech); border-color:var(--tech);">THE OMEGA CONSTRUCT</h2>
                 
-                <div class="monolith" style="padding: 2rem; max-width: 1000px; width: 90vw;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem; text-align:left; border-top:1px solid #333; padding-top:3rem;">
-                        <div>
-                            <h4 style="color:var(--tech); margin-bottom:0.5rem; letter-spacing:0.2em;">X-ROAD PROTOCOL</h4>
-                            <p style="font-size:0.9rem; color:#888;">Dezentraler Datenaustausch nach Estland-Modell. Keine zentrale Schwachstelle.</p>
-                        </div>
-                        <div>
-                            <h4 style="color:var(--tech); margin-bottom:0.5rem; letter-spacing:0.2em;">KSI BLOCKCHAIN</h4>
-                            <p style="font-size:0.9rem; color:#888;">Mathematische Unbestechlichkeit für Los-Verfahren.</p>
-                        </div>
-                        <div>
-                            <h4 style="color:var(--tech); margin-bottom:0.5rem; letter-spacing:0.2em;">DRAND BEACON</h4>
-                            <p style="font-size:0.9rem; color:#888;">Verifizierbarer Zufall. Manipulation physikalisch unmöglich.</p>
-                        </div>
-                        <div>
-                            <h4 style="color:var(--tech); margin-bottom:0.5rem; letter-spacing:0.2em;">EIDAS IDENTITY</h4>
-                            <p style="font-size:0.9rem; color:#888;">Souveräne digitale Bürgerschaft (EU-Standard).</p>
-                        </div>
+                <div class="monolith" style="padding: 3rem; max-width: 1100px; width: 90vw;">
+                    <p style="color:#888; margin-bottom:2rem;">Technische und intellektuelle Validierung des Systems.</p>
+                    
+                    <div class="sanctum-grid">
+                        <a href="https://losdemokratie.de/" target="_blank" class="sanctum-item">
+                            <span class="sanctum-icon">🌐</span>
+                            <span class="sanctum-title">LOSDEMOKRATIE.DE</span>
+                        </a>
+                        <a href="https://www.youtube.com/@nuttlos" target="_blank" class="sanctum-item">
+                            <span class="sanctum-icon">📺</span>
+                            <span class="sanctum-title">NUTT LOS (YOUTUBE)</span>
+                        </a>
+                        <a href="https://www.amazon.de/Gegen-Wahlen-Warum-Abstimmen-demokratisch/dp/3835318713" target="_blank" class="sanctum-item">
+                            <span class="sanctum-icon">📖</span>
+                            <span class="sanctum-title">CODEX: GEGEN WAHLEN</span>
+                        </a>
+                        <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="sanctum-item">
+                            <span class="sanctum-icon">💾</span>
+                            <span class="sanctum-title">MATRIX PDF (TECH)</span>
+                        </a>
                     </div>
-                    <div style="margin-top: 4rem;">
-                        <a href="Argumentations-Matrix & System-Validierung.pdf" target="_blank" class="expand-btn" style="border-color:var(--tech); color:var(--tech); text-decoration:none;">MATRIX.PDF HERUNTERLADEN</a>
-                        <a href="https://www.youtube.com/@ArdalanIbrahim" target="_blank" class="expand-btn" style="text-decoration:none; margin-left: 20px;">YOUTUBE KANAL</a>
+
+                    <div style="margin-top: 3rem; font-size: 0.7rem; color: #444; font-family: monospace;">
+                        SYSTEM STATUS: OPERATIONAL<br>
+                        ARCHITECT: ZERO
                     </div>
                 </div>
             </section>
@@ -257,37 +281,48 @@
     </div>
 
     <script>
-        // --- MASSIVE CONTENT DATABASE (DEBRIS) ---
-        const DEBRIS_DATA = [
-            // Akt 1: Bildung
-            {t:"NEUER ADEL", z:3000}, {t:"PLATONS IRRTUM", z:3500}, {t:"ARROGANZ", z:4000},
-            {t:"GEISSEL DER MENSCHHEIT", z:4500}, {t:"EXKLUSION", z:5000}, {t:"HERRSCHAFTSWISSEN", z:5500},
-            {t:"IDIOTISCHE FANTASIE", z:6500}, {t:"ARISTOKRATIE", z:7000},
-            // Akt 2: Parteien
-            {t:"BRANDBESCHLEUNIGER", z:9000}, {t:"TYRANNEI", z:9500}, {t:"DIKTATUR", z:10000},
-            {t:"PARTEIEN SIND SINNLOS", z:10500}, {t:"KRIEG", z:11000}, {t:"SPALTUNG", z:11500},
-            {t:"MACHTKAMPF", z:12500}, {t:"KEIN GEWISSEN", z:13000},
-            // Akt 3: Politiker
-            {t:"DIENSTLEISTER", z:15000}, {t:"UNPOLITISCHE GESELLSCHAFT", z:15500}, {t:"UNBEGRIFF", z:16000},
-            {t:"LEGITIMATION", z:16500}, {t:"WAHL IST ARISTOKRATISCH", z:17000}, {t:"BERUFSPOLITIK", z:17500},
-            {t:"VERWALTER", z:18500},
-            // Akt 4: Lösung
-            {t:"WIR REGIEREN UNS", z:21000}, {t:"ISONOMIE", z:21500}, {t:"GLEICHHEIT", z:22000},
-            {t:"SOUVERÄNITÄT", z:22500}, {t:"LOSVERFAHREN", z:23000}, {t:"ALEATORIK", z:23500},
-            {t:"FREIHEIT", z:24000}, {t:"KEIN TYRANN", z:24500}, {t:"SYSTEM VALIDIERUNG", z:25000}
+        // --- MASSIVE DEBRIS DATA (FROM UPLOADS) ---
+        const DEBRIS_WORDS = [
+            // Aristokratie & Bildung
+            {t:"NEUER ADEL", z:4000}, {t:"PLATONS IRRTUM", z:5000}, {t:"ARROGANZ", z:5500},
+            {t:"GEISSEL DER MENSCHHEIT", z:6000}, {t:"EXKLUSION", z:6500}, {t:"HERRSCHAFTSWISSEN", z:7000},
+            {t:"IDIOTISCHE FANTASIE", z:8000}, {t:"ARISTOKRATIE", z:8500},
+            // Parteien & Brand
+            {t:"BRANDBESCHLEUNIGER", z:11000}, {t:"TYRANNEI", z:12000}, {t:"DIKTATUR", z:12500},
+            {t:"PARTEIEN SIND SINNLOS", z:13000}, {t:"BÜRGERKRIEG", z:13500}, {t:"SPALTUNG", z:14500},
+            {t:"MACHTKAMPF", z:15000}, {t:"KEIN GEWISSEN", z:15500},
+            // Politik
+            {t:"DIENSTLEISTER", z:18000}, {t:"UNPOLITISCHE GESELLSCHAFT", z:18500}, {t:"UNBEGRIFF", z:19000},
+            {t:"LEGITIMATION", z:20000}, {t:"WAHL IST ARISTOKRATISCH", z:20500}, {t:"BERUFSPOLITIK", z:21000},
+            // Lösung
+            {t:"WIR REGIEREN UNS", z:25000}, {t:"ISONOMIE", z:26000}, {t:"GLEICHHEIT", z:27000},
+            {t:"SOUVERÄNITÄT", z:28000}, {t:"LOSVERFAHREN", z:29000}, {t:"ALEATORIK", z:30000},
+            {t:"FREIHEIT", z:31000}, {t:"KEIN TYRANN", z:32000}
         ];
 
-        // --- LONG TEXTS ---
-        const CONTENT_TEXTS = {
-            'bildung': 'Unsere Kultur ist getrieben von der idiotischen Fantasie, dass Bildung ein Kriterium für Herrschaft sein sollte. Das ist purer Platonismus. Wir halten Individuen frei von Arbeit (Aristokraten), damit sie sich "bilden" und dann über uns herrschen. Das Ergebnis ist eine Exklusion der Mehrheit. Demokratie bedeutet: JEDER ist fähig zu herrschen.',
-            'parteien': 'Parteien sind intern Diktaturen. Wer in eine Partei eintritt, gibt sein Gewissen an der Garderobe ab. Historisch gesehen verhindern Parteien keine Diktaturen – sie gebären sie. Wenn sich die Gesellschaft spaltet und Parteien gegeneinander Krieg führen, ist der Ruf nach dem "starken Mann" die logische Konsequenz.',
-            'politiker': 'Der Begriff "Politiker" ist ein Symptom des Verfalls. In einer Demokratie gibt es keine Politiker, weil ALLE Politiker sind. Was wir heute haben, sind gewählte Aristokraten, die wir alle 4 Jahre legitimieren. Politik ist eine Praxis, kein Beruf.',
-            'los': 'Wenn wir alle regieren, kann kein Tyrann entstehen. Die Losdemokratie ist das einzige System, das Korruption strukturell unmöglich macht. Niemand kann "Karriere" machen. Niemand muss wiedergewählt werden. Es zählt nur das Sachproblem.'
+        // --- CONTENT FOR MODALS ---
+        const CONTENT_DATA = {
+            'bildung': {
+                title: 'Der Bildungs-Adel',
+                text: 'Unsere Kultur ist getrieben von der idiotischen Fantasie, dass Bildung ein Kriterium für Herrschaft sein sollte. Das ist purer Platonismus. Wir halten Individuen frei von Arbeit (Aristokraten), damit sie sich "bilden" und dann über uns herrschen. Demokratie bedeutet: JEDER ist fähig zu herrschen, unabhängig von Bildung.'
+            },
+            'parteien': {
+                title: 'Brandbeschleuniger',
+                text: 'Parteien sind intern Diktaturen. Wer in eine Partei eintritt, gibt sein Gewissen an der Garderobe ab. Historisch gesehen verhindern Parteien keine Diktaturen – sie gebären sie. Wenn sich die Gesellschaft spaltet und Parteien gegeneinander Krieg führen, ist der Ruf nach dem "starken Mann" die logische Konsequenz.'
+            },
+            'politiker': {
+                title: 'Der Dienstleister',
+                text: 'Der Begriff "Politiker" ist ein Symptom des Verfalls. In einer Demokratie gibt es keine Politiker, weil ALLE Politiker sind. Was wir heute haben, sind gewählte Aristokraten. Politik ist eine Praxis, kein Beruf.'
+            },
+            'los': {
+                title: 'Die Kinetische Lösung',
+                text: 'Wenn wir alle regieren, kann kein Tyrann entstehen. Die Losdemokratie ist das einzige System, das Korruption strukturell unmöglich macht. Niemand kann "Karriere" machen. Niemand muss wiedergewählt werden. Es zählt nur das Sachproblem.'
+            }
         };
 
         // --- STATE ---
         const STATE = { scroll: 0, target: 0, w: 0, h: 0, act: 'prolog', audioCtx: null, analyser: null, data: null, activeAudio: null };
-        const CONFIG = { lerp: 0.04 }; // Very heavy scroll
+        const CONFIG = { lerp: 0.03 }; // HEAVY PHYSICS (MUSER MODE)
 
         // --- DOM ---
         const world = document.getElementById('tunnel-world');
@@ -295,8 +330,8 @@
         const ctx = canvas.getContext('2d');
 
         // --- INIT ---
-        window.initializeCathedral = function() {
-            window.scrollTo(0,0); // Force Reset
+        window.initializeSanctum = function() {
+            window.scrollTo(0,0);
             
             try {
                 STATE.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -309,7 +344,7 @@
                     src.connect(STATE.analyser);
                     STATE.analyser.connect(STATE.audioCtx.destination);
                 });
-            } catch(e) {}
+            } catch(e) { console.log("Audio Context prevented by browser policy (Localhost)"); }
 
             document.getElementById('start-screen').style.opacity = 0;
             setTimeout(() => document.getElementById('start-screen').remove(), 1000);
@@ -319,25 +354,20 @@
         // --- DEBRIS GENERATOR ---
         function initDebris() {
             const container = document.getElementById('debris-container');
-            DEBRIS_DATA.forEach(item => {
-                // Generate multiple copies for density
-                for(let i=0; i<3; i++) {
+            DEBRIS_WORDS.forEach(item => {
+                for(let i=0; i<3; i++) { // Dichte verdreifachen
                     const el = document.createElement('div');
                     el.className = 'debris';
                     el.textContent = item.t;
                     
-                    const x = (Math.random() - 0.5) * 1500;
-                    const y = (Math.random() - 0.5) * 800;
-                    const z = item.z + (Math.random() - 0.5) * 800;
-                    const rotX = (Math.random() - 0.5) * 40;
-                    const rotY = (Math.random() - 0.5) * 40;
+                    const x = (Math.random() - 0.5) * 1800; // Weiter Streukreis
+                    const y = (Math.random() - 0.5) * 900;
+                    const z = item.z + (Math.random() - 0.5) * 1000;
                     
                     el.setAttribute('data-base-z', z);
-                    el.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+                    el.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
                     
-                    // Act Styling
-                    if(z > 9000 && z < 14000) el.style.color = '#550000'; // Blood Act 2
-                    if(z > 20000) el.style.color = '#fff'; // White Act 4
+                    if(z > 11000 && z < 16000) el.style.color = '#aa3333'; // Rot in Akt 2
                     
                     container.appendChild(el);
                 }
@@ -348,121 +378,111 @@
             const r = () => { STATE.w = canvas.width = window.innerWidth; STATE.h = canvas.height = window.innerHeight; };
             window.addEventListener('resize', r); r();
             initDebris();
-            
-            // Place Main Nodes
             document.querySelectorAll('.node').forEach(n => {
                 n.style.transform = `translate3d(-50%, -50%, ${n.getAttribute('data-z')}px)`;
             });
         }
         init();
 
-        // --- STARS (ZOOM EFFECT) ---
+        // --- STARFIELD (REVERSE DIRECTION = ZOOM IN) ---
         class Star {
             constructor() { this.reset(); }
             reset() {
-                this.x = (Math.random() - 0.5) * STATE.w * 2;
-                this.y = (Math.random() - 0.5) * STATE.h * 2;
-                this.z = Math.random() * 2000 + 1000; // Start far away
+                this.x = (Math.random() - 0.5) * STATE.w * 3;
+                this.y = (Math.random() - 0.5) * STATE.h * 3;
+                this.z = Math.random() * 2000 + 500; 
                 this.size = Math.random() * 2;
             }
             update(speed) {
-                // Move towards camera based on scroll speed
-                this.z -= (5 + speed * 2);
+                // Move TOWARDS camera (Negative Z logic in loop, but here we simulate flow)
+                this.z -= (2 + speed * 1.5);
                 if(this.z < 1) this.reset();
             }
             draw() {
-                const scale = 1000 / this.z;
+                const scale = 800 / this.z;
                 const x2d = this.x * scale + STATE.w/2;
                 const y2d = this.y * scale + STATE.h/2;
-                
-                ctx.globalAlpha = Math.min(1, (2000 - this.z) / 1000);
-                ctx.fillStyle = STATE.act === 'danger' ? '#ff0000' : '#d4af37';
-                ctx.fillRect(x2d, y2d, this.size * scale, this.size * scale);
+                ctx.fillStyle = STATE.act === 'danger' ? '#ff3333' : '#ffffff';
+                ctx.globalAlpha = Math.min(1, (2000-this.z)/1000);
+                ctx.fillRect(x2d, y2d, this.size*scale, this.size*scale);
             }
         }
-        const stars = Array.from({length: 300}, () => new Star());
+        const stars = Array.from({length: 400}, () => new Star());
 
-        // --- RENDER ---
+        // --- MAIN LOOP ---
         function render() {
             STATE.target = window.scrollY;
             const diff = STATE.target - STATE.scroll;
             STATE.scroll += diff * CONFIG.lerp;
             const speed = Math.abs(diff);
 
-            // Audio
             let bass = 0;
             if(STATE.analyser) {
                 STATE.analyser.getByteFrequencyData(STATE.data);
                 bass = STATE.data[10];
             }
 
-            // 1. World Move (ZOOM IN)
-            // Camera moves forward into negative Z
+            // MOVE WORLD (Negative Z = Forward Movement)
             world.style.transform = `translate3d(0, 0, ${-STATE.scroll.toFixed(2)}px)`;
 
-            // 2. Logic
+            // NODES
             document.querySelectorAll('.node').forEach(n => {
                 const z = parseInt(n.getAttribute('data-z'));
                 const dist = Math.abs(z - STATE.scroll);
-                
                 if(dist < 2000) STATE.act = n.getAttribute('data-act');
 
                 if(dist < 4000) {
                     n.style.visibility = 'visible';
-                    n.style.opacity = 1 - (dist / 3500);
+                    n.style.opacity = 1 - (dist/3500);
                 } else {
                     n.style.visibility = 'hidden';
                 }
 
-                // Audio Auto-Mute
-                if(STATE.activeAudio && dist > 2000) {
+                if(STATE.activeAudio && dist > 2500) {
                     const a = document.getElementById(STATE.activeAudio);
-                    if(a && !a.paused) { 
-                        a.pause(); 
-                        document.querySelector('.monolith.playing').classList.remove('playing');
-                    }
+                    if(a && !a.paused) { a.pause(); document.querySelector('.monolith.playing').classList.remove('playing'); }
                 }
             });
 
-            // 3. Debris Visibility
+            // DEBRIS VISIBILITY
             document.querySelectorAll('.debris').forEach(d => {
                 const z = parseInt(d.getAttribute('data-base-z'));
                 const dist = Math.abs(z - STATE.scroll);
-                // Nur sichtbar wenn nah
-                if(dist < 2000) d.style.opacity = (1 - (dist/2000)) * 0.7;
-                else d.style.opacity = 0;
+                if(dist < 2500) {
+                    d.style.opacity = (1 - (dist/2500)) * 0.6;
+                    // Parallax effect
+                    d.style.transform = `translate3d(${d.style.transform.split('(')[1].split(')')[0]}) scale(${1 + (2500-dist)*0.0005})`;
+                } else {
+                    d.style.opacity = 0;
+                }
             });
 
-            // 4. Canvas
+            // CANVAS
             ctx.clearRect(0,0,STATE.w, STATE.h);
-            stars.forEach(s => {
-                s.update(speed);
-                s.draw();
-            });
+            stars.forEach(s => { s.update(speed + (bass/100)); s.draw(); });
 
             requestAnimationFrame(render);
         }
 
         // --- UTILS ---
-        window.openData = (key) => {
-            const c = CONTENT_TEXTS[key];
-            const t = document.querySelector(`.node[data-act="${key === 'parteien' ? 'danger' : key === 'los' ? 'solution' : key === 'politiker' ? 'void' : 'illusion'}"] h2`).innerText;
-            document.getElementById('data-content-inject').innerHTML = `<h3>${t}</h3><p>${c}</p>`;
+        window.openData = (k) => {
+            const c = CONTENT_DATA[k];
+            document.getElementById('data-content-inject').innerHTML = `<h3>${c.title}</h3><p>${c.text}</p>`;
             document.getElementById('data-overlay').classList.add('active');
         };
         window.closeData = () => document.getElementById('data-overlay').classList.remove('active');
-        
         window.toggleAudio = (id, el) => {
             if(STATE.audioCtx && STATE.audioCtx.state === 'suspended') STATE.audioCtx.resume();
             const a = document.getElementById(id);
             if(!a.paused) {
                 a.pause(); el.classList.remove('playing'); STATE.activeAudio = null;
             } else {
-                document.querySelectorAll('audio').forEach(x => { x.pause(); x.currentTime = 0; });
+                document.querySelectorAll('audio').forEach(x => { x.pause(); x.currentTime=0; });
                 document.querySelectorAll('.monolith').forEach(m => m.classList.remove('playing'));
                 a.play(); el.classList.add('playing'); STATE.activeAudio = id;
             }
         };
+        window.addEventListener('keydown', e => { if(e.key === 'Escape') closeData(); });
 
     </script>
 </body>
